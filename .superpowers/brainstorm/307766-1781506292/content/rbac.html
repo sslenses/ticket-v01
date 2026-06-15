@@ -1,0 +1,72 @@
+<h2>RBAC Matrix (Permissions)</h2>
+<p class="subtitle">Define which roles can execute specific state transitions</p>
+
+<div class="mockup">
+  <div class="mockup-header">Permission Matrix</div>
+  <div class="mockup-body">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid #eee; background-color: #f8f9fa;">
+          <th style="text-align: left; padding: 12px;">Transition</th>
+          <th style="text-align: center; padding: 12px;">Staff/Requester</th>
+          <th style="text-align: center; padding: 12px;">Dest. Manager</th>
+          <th style="text-align: center; padding: 12px;">Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">Create Ticket (Waiting Dest)</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">Approve Destination</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">Approve Admin</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">Send/Receive Cable</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">Mark Done</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: red;">✘</td>
+          <td style="text-align: center; color: green; font-weight: bold;">✔</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Final Confirmation: RBAC Strategy</h3>
+  <p>Based on our discussion, the <b>Destination Manager</b> is restricted to approving their own destination, while <b>Admin</b> has full control. Does this matrix cover your requirements?</p>
+  
+  <div class="options">
+    <div class="option" data-choice="matrix_ok" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Matrix looks good</h3>
+        <p>Proceed to generate the final PRD.</p>
+      </div>
+    </div>
+    <div class="option" data-choice="matrix_adjust" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>I need adjustments</h3>
+        <p>Let's refine the permissions further.</p>
+      </div>
+    </div>
+  </div>
+</div>

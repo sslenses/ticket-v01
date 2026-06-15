@@ -1,0 +1,76 @@
+<h2>Metadata & Validation Rules</h2>
+<p class="subtitle">Review the required fields and validation logic for ticket creation and updates</p>
+
+<div class="mockup">
+  <div class="mockup-header">Ticket Metadata Fields</div>
+  <div class="mockup-body">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid #eee;">
+          <th style="text-align: left; padding: 10px;">Field Name</th>
+          <th style="text-align: left; padding: 10px;">Description</th>
+          <th style="text-align: left; padding: 10px;">Validation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 10px;"><b>source_device</b></td>
+          <td style="padding: 10px;">Originating equipment</td>
+          <td style="padding: 10px;">Required, String</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><b>destination_device</b></td>
+          <td style="padding: 10px;">Target equipment</td>
+          <td style="padding: 10px;">Required, String</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><b>source_tenant</b></td>
+          <td style="padding: 10px;">Owner of source</td>
+          <td style="padding: 10px;">Required, UUID/ID</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><b>destination_tenant</b></td>
+          <td style="padding: 10px;">Owner of destination</td>
+          <td style="padding: 10px;">Required, UUID/ID</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><b>connector_type</b></td>
+          <td style="padding: 10px;">Interface type (LC, SC, etc.)</td>
+          <td style="padding: 10px;">Required, Enum</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><b>label</b></td>
+          <td style="padding: 10px;">Ticket identifier</td>
+          <td style="padding: 10px;">Required, Unique</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;"><b>cable_details</b></td>
+          <td style="padding: 10px;">Specs (length, color)</td>
+          <td style="padding: 10px;">Optional, JSON</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Clarifying Question: Tracking Execution</h3>
+  <p>For each state change, we MUST record <code>user_id</code> and <code>timestamp</code>. How should this be stored?</p>
+  
+  <div class="options">
+    <div class="option" data-choice="audit_log" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Separate Audit Table</h3>
+        <p>A <code>ticket_logs</code> table tracking every single change (detailed history).</p>
+      </div>
+    </div>
+    <div class="option" data-choice="json_column" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>JSON Column in Tickets</h3>
+        <p>A <code>history</code> JSON column inside the <code>tickets</code> table (simpler but less searchable).</p>
+      </div>
+    </div>
+  </div>
+</div>

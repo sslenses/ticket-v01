@@ -1,0 +1,75 @@
+<h2>Ticketing State Machine Flow</h2>
+<p class="subtitle">Review the 6-stage progression logic for the General Ticketing System</p>
+
+<div class="mockup">
+  <div class="mockup-header">State Transition Map</div>
+  <div class="mockup-body">
+    <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; padding: 40px;">
+      
+      <div style="display: flex; gap: 40px; align-items: center;">
+        <div class="card" style="width: 200px; text-align: center; border: 2px solid #007bff;">
+          <div class="label">Step 1</div>
+          <div style="padding: 10px; font-weight: bold;">Waiting Destination</div>
+          <div style="font-size: 0.8em; color: #666;">Initial Request Created</div>
+        </div>
+        <div style="font-size: 24px;">→</div>
+        <div class="card" style="width: 200px; text-align: center; border: 2px solid #28a745;">
+          <div class="label">Step 2</div>
+          <div style="padding: 10px; font-weight: bold;">Approved Destination</div>
+          <div style="font-size: 0.8em; color: #666;">Destination Verified</div>
+        </div>
+        <div style="font-size: 24px;">→</div>
+        <div class="card" style="width: 200px; text-align: center; border: 2px solid #ffc107;">
+          <div class="label">Step 3</div>
+          <div style="padding: 10px; font-weight: bold;">Approved Admin</div>
+          <div style="font-size: 0.8em; color: #666;">Final Admin Approval</div>
+        </div>
+      </div>
+
+      <div style="font-size: 24px;">↓</div>
+
+      <div style="display: flex; gap: 40px; align-items: center;">
+        <div class="card" style="width: 200px; text-align: center; border: 2px solid #17a2b8;">
+          <div class="label">Step 4</div>
+          <div style="padding: 10px; font-weight: bold;">Sended Cable</div>
+          <div style="font-size: 0.8em; color: #666;">Cable in Transit</div>
+        </div>
+        <div style="font-size: 24px;">→</div>
+        <div class="card" style="width: 200px; text-align: center; border: 2px solid #6f42c1;">
+          <div class="label">Step 5</div>
+          <div style="padding: 10px; font-weight: bold;">Received Cable</div>
+          <div style="font-size: 0.8em; color: #666;">At Destination</div>
+        </div>
+        <div style="font-size: 24px;">→</div>
+        <div class="card" style="width: 200px; text-align: center; border: 2px solid #28a745; background-color: #e8f5e9;">
+          <div class="label">Step 6</div>
+          <div style="padding: 10px; font-weight: bold;">Done</div>
+          <div style="font-size: 0.8em; color: #666;">Deployment Complete</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Clarifying Question: Role-Based Transition</h3>
+  <p>Who should be responsible for moving the ticket from <b>Waiting Destination</b> to <b>Approved Destination</b>? Is it a specific "Destination Manager" role, or can any Admin do it?</p>
+  
+  <div class="options">
+    <div class="option" data-choice="dest_manager" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Destination Manager Only</h3>
+        <p>Specific role linked to the destination tenant/device.</p>
+      </div>
+    </div>
+    <div class="option" data-choice="any_admin" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>Any System Admin</h3>
+        <p>Centralized control for all transitions.</p>
+      </div>
+    </div>
+  </div>
+</div>
