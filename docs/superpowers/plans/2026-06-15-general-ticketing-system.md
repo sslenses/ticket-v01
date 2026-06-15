@@ -12,10 +12,10 @@
 
 ### Task 1: Project Initialization
 
-- [ ] **Step 1: Create Laravel Project**
+- [x] **Step 1: Create Laravel Project**
 Run: `composer create-project laravel/laravel .`
 
-- [ ] **Step 2: Configure Environment**
+- [x] **Step 2: Configure Environment**
 Modify `.env` to use PostgreSQL:
 ```env
 DB_CONNECTION=pgsql
@@ -26,7 +26,7 @@ DB_USERNAME=postgres
 DB_PASSWORD=postgres
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 ```bash
 git add .
 git commit -m "chore: initialize laravel project"
@@ -36,7 +36,7 @@ git commit -m "chore: initialize laravel project"
 
 ### Task 2: Database Migrations
 
-- [ ] **Step 1: Create Tickets Migration**
+- [x] **Step 1: Create Tickets Migration**
 Run: `php artisan make:migration create_tickets_table`
 Modify `database/migrations/xxxx_create_tickets_table.php`:
 ```php
@@ -54,7 +54,7 @@ Schema::create('tickets', function (Blueprint $table) {
 });
 ```
 
-- [ ] **Step 2: Create Ticket Logs Migration**
+- [x] **Step 2: Create Ticket Logs Migration**
 Run: `php artisan make:migration create_ticket_logs_table`
 Modify `database/migrations/xxxx_create_ticket_logs_table.php`:
 ```php
@@ -71,7 +71,7 @@ Schema::create('ticket_logs', function (Blueprint $table) {
 - [ ] **Step 3: Run Migrations**
 Run: `php artisan migrate`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add .
 git commit -m "feat: add migrations for tickets and logs"
