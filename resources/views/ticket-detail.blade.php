@@ -60,7 +60,7 @@
           },
 
           isActive(status) {
-              return this.currentStatus === status;
+              return this.currentStatus === status && status !== 'done';
           },
 
           getExecutor(status) {
