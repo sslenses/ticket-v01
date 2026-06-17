@@ -33,6 +33,30 @@
 <body class="min-h-screen flex flex-col bg-radial from-zinc-900 to-zinc-950"
       x-data="{ 
           showCreateModal: false,
+          searchQuery: '',
+          tickets: [
+              @foreach($tickets as $ticket)
+              {
+                  id: {{ $ticket->id }},
+                  label: '{{ $ticket->label }}',
+                  source: '{{ $ticket->source_device }}',
+                  destination: '{{ $ticket->destination_device }}',
+                  connector: '{{ $ticket->connector_type }}',
+                  status: '{{ $ticket->status }}',
+                  statusLabel: '{{ str_replace('_', ' ', $ticket->status) }}'
+              },
+              @endforeach
+          ],
+          filteredTickets() {
+              if (!this.searchQuery) return this.tickets;
+              const q = this.searchQuery.toLowerCase();
+              return this.tickets.filter(t => 
+                  t.label.toLowerCase().includes(q) ||
+                  t.source.toLowerCase().includes(q) ||
+                  t.destination.toLowerCase().includes(q) ||
+                  t.statusLabel.toLowerCase().includes(q)
+              );
+          },
           newTicket: {
               label: '',
               source_device: '',
@@ -181,10 +205,21 @@
 
         <!-- Ticket List Panel -->
         <section class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 shadow-xl">
-            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                <span class="w-2 h-5 rounded bg-violet-600 inline-block"></span>
-                Ticket Queue & Statuses
-            </h2>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <span class="w-2 h-5 rounded bg-violet-600 inline-block"></span>
+                    Ticket Queue & Statuses
+                </h2>
+                <div class="relative w-full sm:w-72">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                        </svg>
+                    </div>
+                    <input type="text" x-model="searchQuery" placeholder="Search by label, device, or status..."
+                           class="w-full bg-zinc-950/70 border border-zinc-850 rounded-xl pl-10 pr-4 py-2 text-xs text-white focus:outline-none focus:border-violet-600 transition-colors placeholder-zinc-500">
+                </div>
+            </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse text-left">
@@ -199,45 +234,45 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-800/60 text-sm text-zinc-300">
-                        @forelse($tickets as $ticket)
-                        <tr class="hover:bg-zinc-800/25 transition-colors duration-200">
-                            <td class="py-4 px-4 font-bold text-white select-all">
-                                {{ $ticket->label }}
-                            </td>
-                            <td class="py-4 px-4">
-                                {{ $ticket->source_device }}
-                            </td>
-                            <td class="py-4 px-4">
-                                {{ $ticket->destination_device }}
-                            </td>
-                            <td class="py-4 px-4 font-mono text-xs text-zinc-400">
-                                {{ $ticket->connector_type }}
-                            </td>
-                            <td class="py-4 px-4">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize"
-                                      :class="{
-                                          'bg-indigo-500/10 text-indigo-400 border-indigo-500/20': '{{ $ticket->status }}' === 'waiting_destination',
-                                          'bg-cyan-500/10 text-cyan-400 border-cyan-500/20': '{{ $ticket->status }}' === 'approved_destination',
-                                          'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': '{{ $ticket->status }}' === 'approved_admin',
-                                          'bg-amber-500/10 text-amber-400 border-amber-500/20': '{{ $ticket->status }}' === 'sended_cable',
-                                          'bg-orange-500/10 text-orange-400 border-orange-500/20': '{{ $ticket->status }}' === 'received_cable',
-                                          'bg-violet-500/10 text-violet-400 border-violet-500/20': '{{ $ticket->status }}' === 'done'
-                                      }">
-                                    {{ str_replace('_', ' ', $ticket->status) }}
-                                </span>
-                            </td>
-                            <td class="py-4 px-4 text-right">
-                                <a href="/tickets/{{ $ticket->id }}" 
-                                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/50 bg-violet-500/5 px-3 py-1.5 rounded-lg transition-all">
-                                    Manage Details
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                                    </svg>
-                                </a>
+                        <template x-for="t in filteredTickets()" :key="t.id">
+                            <tr class="hover:bg-zinc-800/25 transition-colors duration-200">
+                                <td class="py-4 px-4 font-bold text-white select-all" x-text="t.label"></td>
+                                <td class="py-4 px-4" x-text="t.source"></td>
+                                <td class="py-4 px-4" x-text="t.destination"></td>
+                                <td class="py-4 px-4 font-mono text-xs text-zinc-400" x-text="t.connector"></td>
+                                <td class="py-4 px-4">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize"
+                                          :class="{
+                                              'bg-indigo-500/10 text-indigo-400 border-indigo-500/20': t.status === 'waiting_destination',
+                                              'bg-cyan-500/10 text-cyan-400 border-cyan-500/20': t.status === 'approved_destination',
+                                              'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': t.status === 'approved_admin',
+                                              'bg-amber-500/10 text-amber-400 border-amber-500/20': t.status === 'sended_cable',
+                                              'bg-orange-500/10 text-orange-400 border-orange-500/20': t.status === 'received_cable',
+                                              'bg-violet-500/10 text-violet-400 border-violet-500/20': t.status === 'done'
+                                          }"
+                                          x-text="t.statusLabel">
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4 text-right">
+                                    <a :href="'/tickets/' + t.id" 
+                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/50 bg-violet-500/5 px-3 py-1.5 rounded-lg transition-all">
+                                        Manage Details
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                        </svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr x-show="filteredTickets().length === 0 && searchQuery !== ''">
+                            <td colspan="6" class="py-12 text-center text-zinc-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto text-zinc-700 mb-3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                                </svg>
+                                No matching tickets found for "<span class="text-zinc-300 font-medium" x-text="searchQuery"></span>".
                             </td>
                         </tr>
-                        @empty
-                        <tr>
+                        <tr x-show="filteredTickets().length === 0 && searchQuery === ''">
                             <td colspan="6" class="py-12 text-center text-zinc-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto text-zinc-700 mb-3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
@@ -245,7 +280,6 @@
                                 No tickets found. Please create one to start.
                             </td>
                         </tr>
-                        @endforelse
                     </tbody>
                 </table>
             </div>
