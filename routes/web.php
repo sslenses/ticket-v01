@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/', [TicketController::class, 'index']);
+    Route::get('/users', [AuthController::class, 'userList'])->name('users.index');
 
     Route::prefix('api')->group(function () {
         Route::post('/tickets', [TicketController::class, 'store']);

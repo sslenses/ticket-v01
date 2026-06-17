@@ -113,6 +113,11 @@
             
             <!-- User Information & Logout -->
             <div class="flex items-center gap-4">
+                @if (auth()->user()->hasRole('admin'))
+                    <a href="/users" class="text-xs font-semibold text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700 bg-zinc-900/40 px-3.5 py-2 rounded-xl transition-all mr-2">
+                        Manage Users
+                    </a>
+                @endif
                 <div class="flex flex-col items-end text-right">
                     <span class="text-sm font-semibold text-zinc-100">{{ auth()->user()->name }}</span>
                     <span class="text-xs text-zinc-400 font-medium capitalize">{{ str_replace('_', ' ', auth()->user()->role) }}</span>

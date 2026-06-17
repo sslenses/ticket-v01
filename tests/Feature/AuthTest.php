@@ -215,4 +215,37 @@ class AuthTest extends TestCase
             'email' => 'newuser@example.com',
         ]);
     }
+
+    /**
+     * Test that unauthenticated users cannot access the user list.
+     */
+    public function test_unauthenticated_user_cannot_access_user_list(): void
+    {
+        $response = $this->get('/users');
+        $response->assertRedirect('/login');
+    }
+
+    /**
+     * Test that non-admin users cannot access the user list.
+     */
+    public function test_non_admin_user_cannot_access_user_list(): void
+    {
+        $user = User::factory()->create(['role' => 'staff']);
+
+        $response = $this->actingAs($user)->get('/users');
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test that admin users can access the user list.
+     */
+    public function test_admin_user_can_access_user_list(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'staff', 'name' => 'John Staff']);
+
+        $response = $this->actingAs($admin)->get('/users');
+        $response->assertStatus(200);
+        $response->assertSee('John Staff');
+    }
 }

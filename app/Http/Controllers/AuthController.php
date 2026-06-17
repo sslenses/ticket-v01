@@ -85,4 +85,17 @@ class AuthController extends Controller
 
         return redirect('/login')->with('status', 'Registration successful! Please sign in using your credentials.');
     }
+
+    /**
+     * Display a listing of registered users (Admin only).
+     */
+    public function userList()
+    {
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized. Only administrators can access the user list.');
+        }
+
+        $users = \App\Models\User::oldest()->get();
+        return view('auth.users', compact('users'));
+    }
 }
