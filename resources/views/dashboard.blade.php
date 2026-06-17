@@ -28,7 +28,6 @@
 <body class="min-h-screen flex flex-col bg-radial from-zinc-900 to-zinc-950"
       x-data="{ 
           showCreateModal: false,
-          currentRole: '{{ auth()->user() ? auth()->user()->role : 'admin' }}',
           newTicket: {
               label: '',
               source_device: '',
@@ -38,13 +37,6 @@
               connector_type: 'LC-LC',
               length: 10,
               color: 'Yellow'
-          },
-          async switchRole(role) {
-              const response = await fetch(`/api/login-as/${role}`);
-              if (response.ok) {
-                  this.currentRole = role;
-                  window.location.reload();
-              }
           },
           async createTicket() {
               try {
@@ -92,16 +84,18 @@
                 <span class="font-display font-semibold text-lg tracking-tight text-zinc-100">Ticketing System</span>
             </div>
             
-            <!-- Dev Role Switcher -->
-            <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1.5">
-                <span class="text-xs text-zinc-400 font-medium mr-2">Dev Role:</span>
-                <template x-for="r in ['staff', 'dest_manager', 'admin']">
-                    <button @click="switchRole(r)" 
-                            :class="currentRole === r ? 'bg-violet-600 text-white shadow-lg' : 'text-zinc-400 hover:text-zinc-200'"
-                            class="text-xs font-semibold px-3 py-1 rounded-full transition-all duration-300 capitalize">
-                        <span x-text="r.replace('_', ' ')"></span>
+            <!-- User Information & Logout -->
+            <div class="flex items-center gap-4">
+                <div class="flex flex-col items-end text-right">
+                    <span class="text-sm font-semibold text-zinc-100">{{ auth()->user()->name }}</span>
+                    <span class="text-xs text-zinc-400 font-medium capitalize">{{ str_replace('_', ' ', auth()->user()->role) }}</span>
+                </div>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-xs font-semibold text-zinc-200 hover:text-white px-3.5 py-2 rounded-xl transition-all border border-zinc-700/50 cursor-pointer">
+                        Logout
                     </button>
-                </template>
+                </form>
             </div>
         </div>
     </header>

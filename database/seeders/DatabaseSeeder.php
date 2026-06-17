@@ -17,11 +17,21 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'role' => 'admin',
-        ]);
+        $roles = [
+            'admin' => 'admin@example.com',
+            'dest_manager' => 'manager@example.com',
+            'staff' => 'staff@example.com',
+            'user' => 'user@example.com'
+        ];
+
+        foreach ($roles as $role => $email) {
+            User::factory()->create([
+                'name' => ucfirst(str_replace('_', ' ', $role)) . ' User',
+                'email' => $email,
+                'password' => bcrypt('password'),
+                'role' => $role,
+            ]);
+        }
 
         \App\Models\Ticket::create([
             'label' => 'TICKET-2026-001',
