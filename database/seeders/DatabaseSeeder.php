@@ -25,27 +25,31 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($roles as $role => $email) {
-            User::factory()->create([
-                'name' => ucfirst(str_replace('_', ' ', $role)) . ' User',
-                'email' => $email,
-                'password' => bcrypt('password'),
-                'role' => $role,
-            ]);
+            User::updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => ucfirst(str_replace('_', ' ', $role)) . ' User',
+                    'password' => bcrypt('password'),
+                    'role' => $role,
+                ]
+            );
         }
 
-        \App\Models\Ticket::create([
-            'label' => 'TICKET-2026-001',
-            'source_device' => 'Jkt-Core-Sw01',
-            'destination_device' => 'Sg-Dist-Sw02',
-            'source_tenant_id' => \Illuminate\Support\Str::uuid(),
-            'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
-            'connector_type' => 'LC-LC',
-            'cable_details' => [
-                'length' => 15,
-                'color' => 'Yellow',
-                'type' => 'Single-Mode OS2'
-            ],
-            'status' => \App\Models\Ticket::STATUS_WAITING_DESTINATION,
-        ]);
+        \App\Models\Ticket::updateOrCreate(
+            ['label' => 'TICKET-2026-001'],
+            [
+                'source_device' => 'Jkt-Core-Sw01',
+                'destination_device' => 'Sg-Dist-Sw02',
+                'source_tenant_id' => \Illuminate\Support\Str::uuid(),
+                'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
+                'connector_type' => 'LC-LC',
+                'cable_details' => [
+                    'length' => 15,
+                    'color' => 'Yellow',
+                    'type' => 'Single-Mode OS2'
+                ],
+                'status' => \App\Models\Ticket::STATUS_WAITING_DESTINATION,
+            ]
+        );
     }
 }
