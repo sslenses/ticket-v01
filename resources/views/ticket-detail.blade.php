@@ -23,6 +23,11 @@
         h1, h2, h3, .font-display {
             font-family: 'Outfit', sans-serif;
         }
+        @keyframes signal-flow {
+            to {
+                stroke-dashoffset: -20;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-radial from-zinc-900 to-zinc-950" 
@@ -108,11 +113,33 @@
     <!-- Top Navigation -->
     <header class="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-display font-bold text-lg text-white">
-                    T
+            <a href="/" class="flex items-center gap-3 hover:opacity-95 transition-opacity group">
+                <div class="relative w-9 h-9 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center shadow-lg group-hover:border-violet-500/50 transition-all duration-300">
+                    <!-- Glow background -->
+                    <div class="absolute inset-0 bg-gradient-to-tr from-violet-600/20 to-indigo-600/20 rounded-xl blur-sm opacity-50 group-hover:opacity-100 group-hover:blur-md transition-all duration-300"></div>
+                    
+                    <!-- Logo Graphic -->
+                    <svg class="relative w-6 h-6 text-violet-400 group-hover:text-indigo-300 transition-colors duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Connecting Fiber Lines -->
+                        <path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-30" />
+                        <path d="M12 6v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-30" />
+                        
+                        <!-- Animated Signal dashes -->
+                        <path d="M4 6h16" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" class="signal-line" style="stroke-dasharray: 4, 12; animation: signal-flow 2s linear infinite;" />
+                        <path d="M12 6v12" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" class="signal-line" style="stroke-dasharray: 4, 12; animation: signal-flow 2s linear infinite;" />
+
+                        <!-- Network Node Circles -->
+                        <circle cx="4" cy="6" r="2" fill="currentColor" />
+                        <circle cx="20" cy="6" r="2" fill="currentColor" />
+                        <circle cx="12" cy="18" r="2" fill="currentColor" />
+                        
+                        <!-- Glowing Pulsing Core -->
+                        <circle cx="12" cy="6" r="3.5" fill="#818cf8" class="animate-ping opacity-75" />
+                        <circle cx="12" cy="6" r="3.5" fill="#6366f1" />
+                        <circle cx="12" cy="6" r="1.5" fill="#ffffff" />
+                    </svg>
                 </div>
-                <span class="font-display font-semibold text-lg tracking-tight text-zinc-100">Ticketing System</span>
+                <span class="font-display font-semibold text-lg tracking-tight text-zinc-100 group-hover:text-violet-300 transition-colors duration-350">Ticketing System</span>
             </a>
             
             <!-- User Information & Logout / Login Link -->
