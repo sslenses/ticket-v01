@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('label')->unique();
             $table->string('source_device');
             $table->string('destination_device');
-            $table->uuid('source_tenant_id');
-            $table->uuid('destination_tenant_id');
+            $table->uuid('source_tenant_id')->index();
+            $table->uuid('destination_tenant_id')->index();
             $table->string('connector_type');
             $table->jsonb('cable_details')->nullable();
-            $table->string('status')->default('waiting_destination');
+            $table->string('status')->default('waiting_destination')->index();
             $table->timestamps();
         });
     }

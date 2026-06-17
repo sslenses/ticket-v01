@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('ticket_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('ticket_id')->index()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->index()->constrained();
             $table->string('from_state');
             $table->string('to_state');
             $table->timestamps();
+
+            $table->index('created_at');
         });
     }
 
