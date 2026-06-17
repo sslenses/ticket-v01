@@ -22,6 +22,15 @@ class TicketController extends Controller
     }
 
     /**
+     * Display a listing of tickets.
+     */
+    public function index()
+    {
+        $tickets = Ticket::latest()->get();
+        return view('dashboard', compact('tickets'));
+    }
+
+    /**
      * Store a newly created ticket in storage.
      */
     public function store(StoreTicketRequest $request)
