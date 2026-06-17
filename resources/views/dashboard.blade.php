@@ -109,7 +109,8 @@
         }
     </script>
     
-    <style>
+    <style type="text/tailwindcss">
+        @custom-variant dark (&:where(.dark, .dark *));
         body {
             font-family: 'Inter', sans-serif;
         }
