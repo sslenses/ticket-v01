@@ -7,6 +7,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/tickets/{ticket}', [TicketController::class, 'show']);
+
 Route::prefix('api')->group(function () {
     Route::post('/tickets', [TicketController::class, 'store']);
     Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus']);

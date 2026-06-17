@@ -36,6 +36,15 @@ class TicketController extends Controller
     }
 
     /**
+     * Display the specified ticket.
+     */
+    public function show(Ticket $ticket)
+    {
+        $ticket->load('logs.user');
+        return view('ticket-detail', compact('ticket'));
+    }
+
+    /**
      * Update the status of the ticket.
      */
     public function updateStatus(Request $request, Ticket $ticket)
