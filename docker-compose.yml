@@ -9,6 +9,7 @@ services:
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - SERVER_NAME=:80
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
