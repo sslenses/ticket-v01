@@ -211,4 +211,111 @@ class TicketLifecycleTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonPath('message', "Invalid state transition from 'waiting_destination' to 'done'.");
     }
+
+    /**
+     * Test that staff or admin can successfully cancel a ticket.
+     */
+    public function test_authorized_user_can_cancel_ticket()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $ticket = Ticket::create([
+            'label' => 'TICKET-CANCEL-1',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => Str::uuid(),
+            'destination_tenant_id' => Str::uuid(),
+            'connector_type' => 'LC',
+            'status' => Ticket::STATUS_WAITING_DESTINATION,
+        ]);
+
+        $response = $this->actingAs($admin)->patchJson("/api/tickets/{$ticket->id}/status", [
+            'status' => Ticket::STATUS_CANCELLED,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(Ticket::STATUS_CANCELLED, $ticket->fresh()->status);
+    }
+
+    /**
+     * Test that staff or admin can edit details of a pending ticket.
+     */
+    public function test_authorized_user_can_edit_ticket_details()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $ticket = Ticket::create([
+            'label' => 'TICKET-EDIT-1',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => Str::uuid()->toString(),
+            'destination_tenant_id' => Str::uuid()->toString(),
+            'connector_type' => 'LC',
+            'status' => Ticket::STATUS_WAITING_DESTINATION,
+        ]);
+
+        $response = $this->actingAs($admin)->patchJson("/api/tickets/{$ticket->id}", [
+            'label' => 'TICKET-EDITED-NEW',
+            'source_device' => 'Device Changed',
+            'destination_device' => 'Device Changed B',
+            'source_tenant_id' => Str::uuid()->toString(),
+            'destination_tenant_id' => Str::uuid()->toString(),
+            'connector_type' => 'SC',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('TICKET-EDITED-NEW', $ticket->fresh()->label);
+        $this->assertEquals('Device Changed', $ticket->fresh()->source_device);
+    }
+
+    /**
+     * Test that no further transitions or edits can be done once a ticket is cancelled.
+     */
+    public function test_cancelled_ticket_cannot_be_transitioned_or_edited()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $ticket = Ticket::create([
+            'label' => 'TICKET-CANCEL-2',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => Str::uuid()->toString(),
+            'destination_tenant_id' => Str::uuid()->toString(),
+            'connector_type' => 'LC',
+            'status' => Ticket::STATUS_CANCELLED,
+        ]);
+
+        // Attempting status transition
+        $response1 = $this->actingAs($admin)->patchJson("/api/tickets/{$ticket->id}/status", [
+            'status' => Ticket::STATUS_APPROVED_DESTINATION,
+        ]);
+        $response1->assertStatus(403);
+
+        // Attempting edit details
+        $response2 = $this->actingAs($admin)->patchJson("/api/tickets/{$ticket->id}", [
+            'label' => 'TICKET-EDITED-FAIL',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => Str::uuid()->toString(),
+            'destination_tenant_id' => Str::uuid()->toString(),
+            'connector_type' => 'LC',
+        ]);
+        $response2->assertStatus(403);
+    }
+
+    /**
+     * Test that guest users cannot access cancelled tickets (returns 403).
+     */
+    public function test_guest_cannot_access_cancelled_ticket()
+    {
+        $ticket = Ticket::create([
+            'label' => 'TICKET-CANCEL-3',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => Str::uuid()->toString(),
+            'destination_tenant_id' => Str::uuid()->toString(),
+            'connector_type' => 'LC',
+            'status' => Ticket::STATUS_CANCELLED,
+        ]);
+
+        $response = $this->get("/tickets/{$ticket->id}");
+        $response->assertStatus(403);
+    }
 }

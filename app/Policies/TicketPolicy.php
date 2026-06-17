@@ -21,6 +21,9 @@ class TicketPolicy
      */
     public function approveDestination(User $user, Ticket $ticket): bool
     {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
         return $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 
@@ -29,6 +32,9 @@ class TicketPolicy
      */
     public function approveAdmin(User $user, Ticket $ticket): bool
     {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
         return $user->hasRole('admin');
     }
 
@@ -37,6 +43,9 @@ class TicketPolicy
      */
     public function sendCable(User $user, Ticket $ticket): bool
     {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
         return $user->hasRole('admin');
     }
 
@@ -45,6 +54,9 @@ class TicketPolicy
      */
     public function receiveCable(User $user, Ticket $ticket): bool
     {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
         return $user->hasRole('admin');
     }
 
@@ -53,6 +65,33 @@ class TicketPolicy
      */
     public function markDone(User $user, Ticket $ticket): bool
     {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
         return $user->hasRole('admin');
+    }
+
+    /**
+     * Determine whether the user can update the ticket.
+     */
+    public function update(User $user, Ticket $ticket): bool
+    {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
+
+        return $user->hasRole('staff') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+    }
+
+    /**
+     * Determine whether the user can cancel the ticket.
+     */
+    public function cancel(User $user, Ticket $ticket): bool
+    {
+        if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            return false;
+        }
+
+        return $user->hasRole('staff') || $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 }

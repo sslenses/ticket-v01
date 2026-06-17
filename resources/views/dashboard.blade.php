@@ -282,7 +282,8 @@
                                               'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': t.status === 'approved_admin',
                                               'bg-amber-500/10 text-amber-400 border-amber-500/20': t.status === 'sended_cable',
                                               'bg-orange-500/10 text-orange-400 border-orange-500/20': t.status === 'received_cable',
-                                              'bg-violet-500/10 text-violet-400 border-violet-500/20': t.status === 'done'
+                                              'bg-violet-500/10 text-violet-400 border-violet-500/20': t.status === 'done',
+                                              'bg-red-500/10 text-red-400 border-red-500/20': t.status === 'cancelled'
                                           }"
                                           x-text="t.statusLabel">
                                     </span>

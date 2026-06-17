@@ -23,6 +23,7 @@ class Ticket extends Model
     const STATUS_SENDED_CABLE = 'sended_cable';
     const STATUS_RECEIVED_CABLE = 'received_cable';
     const STATUS_DONE = 'done';
+    const STATUS_CANCELLED = 'cancelled';
 
     /**
      * Get the logs for the ticket.

@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('api')->group(function () {
         Route::post('/tickets', [TicketController::class, 'store']);
+        Route::patch('/tickets/{ticket}', [TicketController::class, 'update']);
         Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus']);
     });
 });

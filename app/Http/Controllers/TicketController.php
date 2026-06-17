@@ -53,8 +53,8 @@ class TicketController extends Controller
         
         $isPublic = !auth()->check();
 
-        if ($isPublic && $ticket->status === Ticket::STATUS_DONE) {
-            abort(403, 'Public access to completed tickets is disabled. Please log in to view.');
+        if ($isPublic && in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
+            abort(403, 'Access to this ticket is restricted. Completed or cancelled tickets are not viewable publicly.');
         }
 
         return view('ticket-detail', compact('ticket', 'isPublic'));
@@ -77,6 +77,7 @@ class TicketController extends Controller
             Ticket::STATUS_SENDED_CABLE         => 'sendCable',
             Ticket::STATUS_RECEIVED_CABLE       => 'receiveCable',
             Ticket::STATUS_DONE                 => 'markDone',
+            Ticket::STATUS_CANCELLED            => 'cancel',
         ];
 
         $policyMethod = $statusToPolicyMap[$status] ?? null;
@@ -92,6 +93,28 @@ class TicketController extends Controller
         } catch (\InvalidArgumentException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+
+        return response()->json($ticket);
+    }
+
+    /**
+     * Update the specified ticket details.
+     */
+    public function update(Request $request, Ticket $ticket)
+    {
+        Gate::authorize('update', $ticket);
+
+        $validated = $request->validate([
+            'label' => 'required|string|unique:tickets,label,' . $ticket->id,
+            'source_device' => 'required|string',
+            'destination_device' => 'required|string',
+            'source_tenant_id' => 'required|uuid',
+            'destination_tenant_id' => 'required|uuid',
+            'connector_type' => 'required|string',
+            'cable_details' => 'nullable|array',
+        ]);
+
+        $ticket->update($validated);
 
         return response()->json($ticket);
     }

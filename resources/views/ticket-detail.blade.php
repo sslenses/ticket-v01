@@ -56,6 +56,20 @@
               { key: 'done', label: 'Completed', color: 'violet' }
           ],
           
+          showEditModal: false,
+          @if (!$isPublic)
+          editTicket: {
+              label: '{{ $ticket->label }}',
+              source_device: '{{ $ticket->source_device }}',
+              destination_device: '{{ $ticket->destination_device }}',
+              source_tenant_id: '{{ $ticket->source_tenant_id }}',
+              destination_tenant_id: '{{ $ticket->destination_tenant_id }}',
+              connector_type: '{{ $ticket->connector_type }}',
+              length: {{ $ticket->cable_details['length'] ?? 0 }},
+              color: '{{ $ticket->cable_details['color'] ?? '' }}'
+          },
+          @endif
+          
           getStageIndex(status) {
               return this.stages.findIndex(s => s.key === status);
           },
@@ -107,7 +121,44 @@
               } catch (e) {
                   alert('Error communicating with server.');
               }
+          },
+
+          @if (!$isPublic)
+          async updateTicket() {
+              try {
+                  const response = await fetch(`/api/tickets/{{ $ticket->id }}`, {
+                      method: 'PATCH',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json',
+                          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                      },
+                      body: JSON.stringify({
+                          label: this.editTicket.label,
+                          source_device: this.editTicket.source_device,
+                          destination_device: this.editTicket.destination_device,
+                          source_tenant_id: this.editTicket.source_tenant_id,
+                          destination_tenant_id: this.editTicket.destination_tenant_id,
+                          connector_type: this.editTicket.connector_type,
+                          cable_details: {
+                              length: parseInt(this.editTicket.length),
+                              color: this.editTicket.color
+                          }
+                      })
+                  });
+
+                  if (!response.ok) {
+                      const err = await response.json();
+                      alert('Failed to update ticket: ' + (err.message || 'Validation error'));
+                      return;
+                  }
+
+                  window.location.reload();
+              } catch (e) {
+                  alert('Error communicating with server.');
+              }
           }
+          @endif
       }">
 
     <!-- Top Navigation -->
@@ -186,6 +237,21 @@
                 </a>
             </div>
         @endif
+
+        <!-- Cancelled Alert Banner -->
+        <template x-if="currentStatus === 'cancelled'">
+            <div class="rounded-2xl border border-red-500/20 bg-red-500/5 backdrop-blur-xl p-5 flex items-start gap-4 shadow-xl select-none animate-pulse">
+                <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-red-400">This ticket has been cancelled</h3>
+                    <p class="text-xs text-zinc-400 mt-1">This ticket is inactive. Further status transitions and details editing are permanently locked.</p>
+                </div>
+            </div>
+        </template>
         
         <!-- Ticket Header Card -->
         <section class="relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
@@ -220,13 +286,29 @@
                         'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': currentStatus === 'approved_admin',
                         'bg-amber-500/10 text-amber-400 border-amber-500/20': currentStatus === 'sended_cable',
                         'bg-orange-500/10 text-orange-400 border-orange-500/20': currentStatus === 'received_cable',
-                        'bg-violet-500/10 text-violet-400 border-violet-500/20': currentStatus === 'done'
+                        'bg-violet-500/10 text-violet-400 border-violet-500/20': currentStatus === 'done',
+                        'bg-red-500/10 text-red-400 border-red-500/20': currentStatus === 'cancelled'
                     }" class="inline-flex px-4 py-1.5 rounded-full text-sm font-semibold border capitalize tracking-wide shadow-inner" x-text="currentStatus.replace('_', ' ')"></span>
                 </div>
                 
                 @if (!$isPublic)
                     <!-- Interactive Action Button (for testing transitions easily) -->
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2 justify-end">
+                        @can('update', $ticket)
+                            <button x-show="currentStatus !== 'done' && currentStatus !== 'cancelled'"
+                                    @click="showEditModal = true"
+                                    class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
+                                Edit Details
+                            </button>
+                        @endcan
+                        @can('cancel', $ticket)
+                            <button x-show="currentStatus !== 'done' && currentStatus !== 'cancelled'"
+                                    @click="if(confirm('Are you sure you want to cancel this ticket? It cannot be used or modified after cancellation.')) transitionStatus('cancelled')"
+                                    class="bg-red-950/80 hover:bg-red-900 border border-red-800 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-red-200 shadow-lg cursor-pointer">
+                                Cancel Ticket
+                            </button>
+                        @endcan
+
                         <!-- If Waiting Dest -> Approve Dest -->
                         <button x-show="currentStatus === 'waiting_destination' && (currentRole === 'dest_manager' || currentRole === 'admin')"
                                 @click="transitionStatus('approved_destination')"
@@ -274,7 +356,7 @@
                 <div class="hidden md:block absolute top-[18px] left-[20px] right-[20px] h-1 bg-zinc-800 rounded-full z-0">
                     <!-- Progress Fill Line -->
                     <div class="h-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 rounded-full transition-all duration-700 ease-out"
-                         :style="{ width: (getStageIndex(currentStatus) / (stages.length - 1)) * 100 + '%' }"></div>
+                         :style="{ width: (currentStatus === 'cancelled' ? 0 : (getStageIndex(currentStatus) / (stages.length - 1)) * 100) + '%' }"></div>
                 </div>
 
                 <template x-for="(stage, index) in stages" :key="stage.key">
@@ -567,6 +649,89 @@
         </section>
         
     </main>
+
+    @if (!$isPublic)
+    <!-- Edit Ticket Modal -->
+    <div x-show="showEditModal" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         style="display: none;">
+        
+        <div class="relative w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-6"
+             @click.away="showEditModal = false">
+            
+            <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                <h3 class="text-lg font-bold text-white">Edit Ticket Details</h3>
+                <button @click="showEditModal = false" class="text-zinc-500 hover:text-zinc-300 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form @submit.prevent="updateTicket" class="space-y-4">
+                <div>
+                    <label class="text-xs text-zinc-400 font-semibold block mb-1">Ticket Label (Unique)</label>
+                    <input type="text" x-model="editTicket.label" required placeholder="e.g. TICKET-101"
+                           class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-600 transition-colors">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-zinc-400 font-semibold block mb-1">Source Device</label>
+                        <input type="text" x-model="editTicket.source_device" required placeholder="e.g. JKT-SW-01"
+                               class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-600 transition-colors">
+                    </div>
+                    <div>
+                        <label class="text-xs text-zinc-400 font-semibold block mb-1">Destination Device</label>
+                        <input type="text" x-model="editTicket.destination_device" required placeholder="e.g. SG-SW-02"
+                               class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-600 transition-colors">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-zinc-400 font-semibold block mb-1">Connector Type</label>
+                        <select x-model="editTicket.connector_type"
+                                class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-600 transition-colors">
+                            <option value="LC-LC">LC-LC</option>
+                            <option value="SC-SC">SC-SC</option>
+                            <option value="FC-FC">FC-FC</option>
+                            <option value="RJ45">RJ45</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-zinc-400 font-semibold block mb-1">Cable Length (m)</label>
+                        <input type="number" x-model="editTicket.length" required
+                               class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-600 transition-colors">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs text-zinc-400 font-semibold block mb-1">Cable Color</label>
+                    <input type="text" x-model="editTicket.color" required placeholder="e.g. Yellow, Aqua"
+                           class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-600 transition-colors">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-zinc-800">
+                    <button type="button" @click="showEditModal = false"
+                            class="bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold px-4 py-2.5 rounded-lg text-zinc-300 transition-colors cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="bg-violet-600 hover:bg-violet-500 text-xs font-semibold px-4 py-2.5 rounded-lg text-white transition-colors cursor-pointer">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 
     <!-- Footer -->
     <footer class="border-t border-zinc-800 bg-zinc-950 py-6 text-center text-xs text-zinc-600">

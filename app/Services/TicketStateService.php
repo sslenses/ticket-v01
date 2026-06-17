@@ -21,14 +21,14 @@ class TicketStateService
         $fromState = $ticket->status;
 
         $validTransitions = [
-            Ticket::STATUS_WAITING_DESTINATION => Ticket::STATUS_APPROVED_DESTINATION,
-            Ticket::STATUS_APPROVED_DESTINATION => Ticket::STATUS_APPROVED_ADMIN,
-            Ticket::STATUS_APPROVED_ADMIN => Ticket::STATUS_SENDED_CABLE,
-            Ticket::STATUS_SENDED_CABLE => Ticket::STATUS_RECEIVED_CABLE,
-            Ticket::STATUS_RECEIVED_CABLE => Ticket::STATUS_DONE,
+            Ticket::STATUS_WAITING_DESTINATION => [Ticket::STATUS_APPROVED_DESTINATION, Ticket::STATUS_CANCELLED],
+            Ticket::STATUS_APPROVED_DESTINATION => [Ticket::STATUS_APPROVED_ADMIN, Ticket::STATUS_CANCELLED],
+            Ticket::STATUS_APPROVED_ADMIN => [Ticket::STATUS_SENDED_CABLE, Ticket::STATUS_CANCELLED],
+            Ticket::STATUS_SENDED_CABLE => [Ticket::STATUS_RECEIVED_CABLE, Ticket::STATUS_CANCELLED],
+            Ticket::STATUS_RECEIVED_CABLE => [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED],
         ];
 
-        if (!isset($validTransitions[$fromState]) || $validTransitions[$fromState] !== $toState) {
+        if (!isset($validTransitions[$fromState]) || !in_array($toState, $validTransitions[$fromState])) {
             throw new \InvalidArgumentException("Invalid state transition from '{$fromState}' to '{$toState}'.");
         }
 
