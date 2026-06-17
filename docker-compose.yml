@@ -20,6 +20,28 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=ticket_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    volumes:
+      - .:/app
+    command: php artisan migrate --force
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:16-alpine
