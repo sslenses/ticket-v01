@@ -108,12 +108,12 @@
     <!-- Top Navigation -->
     <header class="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
+            <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-display font-bold text-lg text-white">
                     T
                 </div>
                 <span class="font-display font-semibold text-lg tracking-tight text-zinc-100">Ticketing System</span>
-            </div>
+            </a>
             
             <!-- User Information & Logout / Login Link -->
             @if ($isPublic)
@@ -141,7 +141,19 @@
     </header>
 
     <!-- Main Container -->
-    <main class="flex-1 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+    <main class="flex-1 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+        
+        <!-- Back Navigation / Breadcrumb -->
+        @if (!$isPublic)
+            <div class="flex items-center">
+                <a href="/" class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition-colors bg-zinc-900/40 border border-zinc-800/80 px-3 py-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                    Back to Dashboard
+                </a>
+            </div>
+        @endif
         
         <!-- Ticket Header Card -->
         <section class="relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
