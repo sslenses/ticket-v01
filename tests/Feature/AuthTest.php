@@ -79,4 +79,70 @@ class AuthTest extends TestCase
         $response->assertRedirect('/login');
         $this->assertGuest();
     }
+
+    /**
+     * Test that guests can access a ticket's detail page in a simplified form.
+     */
+    public function test_guest_can_access_active_ticket_details_simplified(): void
+    {
+        $ticket = \App\Models\Ticket::create([
+            'label' => 'TICKET-ACTIVE-101',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'connector_type' => 'LC',
+            'status' => \App\Models\Ticket::STATUS_WAITING_DESTINATION,
+        ]);
+
+        $response = $this->get("/tickets/{$ticket->id}");
+
+        $response->assertStatus(200);
+        $response->assertSee('Technical Data Locked');
+        $response->assertSee('Audit logs Locked');
+        $response->assertDontSee($ticket->source_device);
+    }
+
+    /**
+     * Test that guests cannot access a ticket's detail page if it is completed (done).
+     */
+    public function test_guest_cannot_access_done_ticket(): void
+    {
+        $ticket = \App\Models\Ticket::create([
+            'label' => 'TICKET-DONE-102',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'connector_type' => 'LC',
+            'status' => \App\Models\Ticket::STATUS_DONE,
+        ]);
+
+        $response = $this->get("/tickets/{$ticket->id}");
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test that authenticated users can access completed (done) tickets.
+     */
+    public function test_authenticated_user_can_access_done_ticket(): void
+    {
+        $user = User::factory()->create();
+        $ticket = \App\Models\Ticket::create([
+            'label' => 'TICKET-DONE-103',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'connector_type' => 'LC',
+            'status' => \App\Models\Ticket::STATUS_DONE,
+        ]);
+
+        $response = $this->actingAs($user)->get("/tickets/{$ticket->id}");
+
+        $response->assertStatus(200);
+        $response->assertSee($ticket->source_device);
+        $response->assertDontSee('Technical Data Locked');
+    }
 }

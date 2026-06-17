@@ -50,7 +50,14 @@ class TicketController extends Controller
     public function show(Ticket $ticket)
     {
         $ticket->load('logs.user');
-        return view('ticket-detail', compact('ticket'));
+        
+        $isPublic = !auth()->check();
+
+        if ($isPublic && $ticket->status === Ticket::STATUS_DONE) {
+            abort(403, 'Public access to completed tickets is disabled. Please log in to view.');
+        }
+
+        return view('ticket-detail', compact('ticket', 'isPublic'));
     }
 
     /**

@@ -115,19 +115,28 @@
                 <span class="font-display font-semibold text-lg tracking-tight text-zinc-100">Ticketing System</span>
             </div>
             
-            <!-- User Information & Logout -->
-            <div class="flex items-center gap-4">
-                <div class="flex flex-col items-end text-right">
-                    <span class="text-sm font-semibold text-zinc-100">{{ auth()->user()->name }}</span>
-                    <span class="text-xs text-zinc-400 font-medium capitalize">{{ str_replace('_', ' ', auth()->user()->role) }}</span>
+            <!-- User Information & Logout / Login Link -->
+            @if ($isPublic)
+                <a href="{{ route('login') }}" class="bg-violet-600 hover:bg-violet-500 active:scale-95 text-xs font-semibold text-white px-4 py-2 rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer border border-violet-500/25">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                    </svg>
+                    Sign In
+                </a>
+            @else
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end text-right">
+                        <span class="text-sm font-semibold text-zinc-100">{{ auth()->user()->name }}</span>
+                        <span class="text-xs text-zinc-400 font-medium capitalize">{{ str_replace('_', ' ', auth()->user()->role) }}</span>
+                    </div>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-xs font-semibold text-zinc-200 hover:text-white px-3.5 py-2 rounded-xl transition-all border border-zinc-700/50 cursor-pointer">
+                            Logout
+                        </button>
+                    </form>
                 </div>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-xs font-semibold text-zinc-200 hover:text-white px-3.5 py-2 rounded-xl transition-all border border-zinc-700/50 cursor-pointer">
-                        Logout
-                    </button>
-                </form>
-            </div>
+            @endif
         </div>
     </header>
 
@@ -149,7 +158,11 @@
                     {{ $ticket->label }}
                 </h1>
                 <p class="text-zinc-400 text-sm md:text-base max-w-2xl">
-                    Technical ticket for optical connection from <span class="text-zinc-100 font-semibold">{{ $ticket->source_device }}</span> to <span class="text-zinc-100 font-semibold">{{ $ticket->destination_device }}</span>.
+                    @if ($isPublic)
+                        Technical ticket for optical connection. <span class="text-zinc-500 font-medium">Log in to view devices.</span>
+                    @else
+                        Technical ticket for optical connection from <span class="text-zinc-100 font-semibold">{{ $ticket->source_device }}</span> to <span class="text-zinc-100 font-semibold">{{ $ticket->destination_device }}</span>.
+                    @endif
                 </p>
             </div>
             
@@ -167,39 +180,41 @@
                     }" class="inline-flex px-4 py-1.5 rounded-full text-sm font-semibold border capitalize tracking-wide shadow-inner" x-text="currentStatus.replace('_', ' ')"></span>
                 </div>
                 
-                <!-- Interactive Action Button (for testing transitions easily) -->
-                <div class="flex gap-2">
-                    <!-- If Waiting Dest -> Approve Dest -->
-                    <button x-show="currentStatus === 'waiting_destination' && (currentRole === 'dest_manager' || currentRole === 'admin')"
-                            @click="transitionStatus('approved_destination')"
-                            class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
-                        Approve Destination
-                    </button>
-                    <!-- If Approved Dest -> Approve Admin -->
-                    <button x-show="currentStatus === 'approved_destination' && currentRole === 'admin'"
-                            @click="transitionStatus('approved_admin')"
-                            class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
-                        Approve Admin
-                    </button>
-                    <!-- If Approved Admin -> Send Cable -->
-                    <button x-show="currentStatus === 'approved_admin' && currentRole === 'admin'"
-                            @click="transitionStatus('sended_cable')"
-                            class="bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
-                        Send Cable
-                    </button>
-                    <!-- If Sended Cable -> Receive Cable -->
-                    <button x-show="currentStatus === 'sended_cable' && currentRole === 'admin'"
-                            @click="transitionStatus('received_cable')"
-                            class="bg-orange-600 hover:bg-orange-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
-                        Receive Cable
-                    </button>
-                    <!-- If Received Cable -> Mark Done -->
-                    <button x-show="currentStatus === 'received_cable' && currentRole === 'admin'"
-                            @click="transitionStatus('done')"
-                            class="bg-violet-600 hover:bg-violet-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
-                        Mark Complete (Done)
-                    </button>
-                </div>
+                @if (!$isPublic)
+                    <!-- Interactive Action Button (for testing transitions easily) -->
+                    <div class="flex gap-2">
+                        <!-- If Waiting Dest -> Approve Dest -->
+                        <button x-show="currentStatus === 'waiting_destination' && (currentRole === 'dest_manager' || currentRole === 'admin')"
+                                @click="transitionStatus('approved_destination')"
+                                class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
+                            Approve Destination
+                        </button>
+                        <!-- If Approved Dest -> Approve Admin -->
+                        <button x-show="currentStatus === 'approved_destination' && currentRole === 'admin'"
+                                @click="transitionStatus('approved_admin')"
+                                class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
+                            Approve Admin
+                        </button>
+                        <!-- If Approved Admin -> Send Cable -->
+                        <button x-show="currentStatus === 'approved_admin' && currentRole === 'admin'"
+                                @click="transitionStatus('sended_cable')"
+                                class="bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
+                            Send Cable
+                        </button>
+                        <!-- If Sended Cable -> Receive Cable -->
+                        <button x-show="currentStatus === 'sended_cable' && currentRole === 'admin'"
+                                @click="transitionStatus('received_cable')"
+                                class="bg-orange-600 hover:bg-orange-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
+                            Receive Cable
+                        </button>
+                        <!-- If Received Cable -> Mark Done -->
+                        <button x-show="currentStatus === 'received_cable' && currentRole === 'admin'"
+                                @click="transitionStatus('done')"
+                                class="bg-violet-600 hover:bg-violet-500 active:scale-95 transition-all text-xs font-semibold px-4 py-2 rounded-lg text-white shadow-lg cursor-pointer">
+                            Mark Complete (Done)
+                        </button>
+                    </div>
+                @endif
             </div>
         </section>
 
@@ -290,18 +305,39 @@
                     </div>
                 </div>
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs text-zinc-500 font-semibold block uppercase">Device Name</label>
-                        <span class="text-sm text-zinc-200 font-medium">{{ $ticket->source_device }}</span>
+                @if ($isPublic)
+                    <div class="flex-1 flex flex-col items-center justify-center py-6 text-center relative overflow-hidden">
+                        <!-- Blurred Mock Data Background -->
+                        <div class="filter blur-md select-none opacity-20 pointer-events-none w-full space-y-2">
+                            <div class="h-4 bg-zinc-700 rounded w-3/4 mx-auto"></div>
+                            <div class="h-3 bg-zinc-700 rounded w-5/6 mx-auto"></div>
+                        </div>
+                        
+                        <!-- Lock Centered Overlay -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center p-4">
+                            <div class="w-8 h-8 rounded-full bg-zinc-850 border border-zinc-805 flex items-center justify-center text-zinc-400 mb-1.5 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold text-zinc-300">Technical Data Locked</span>
+                            <p class="text-[10px] text-zinc-500 mt-0.5 max-w-[200px]">Sign in to view equipment name and Tenant ID.</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs text-zinc-500 font-semibold block uppercase">Tenant ID</label>
-                        <span class="text-xs font-mono bg-zinc-950/70 border border-zinc-800/80 px-2 py-1 rounded select-all text-zinc-300 block overflow-ellipsis truncate" title="{{ $ticket->source_tenant_id }}">
-                            {{ $ticket->source_tenant_id }}
-                        </span>
+                @else
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-zinc-500 font-semibold block uppercase">Device Name</label>
+                            <span class="text-sm text-zinc-200 font-medium">{{ $ticket->source_device }}</span>
+                        </div>
+                        <div>
+                            <label class="text-xs text-zinc-500 font-semibold block uppercase">Tenant ID</label>
+                            <span class="text-xs font-mono bg-zinc-950/70 border border-zinc-800/80 px-2 py-1 rounded select-all text-zinc-300 block overflow-ellipsis truncate" title="{{ $ticket->source_tenant_id }}">
+                                {{ $ticket->source_tenant_id }}
+                            </span>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
 
             <!-- Destination Device Card -->
@@ -318,18 +354,39 @@
                     </div>
                 </div>
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs text-zinc-500 font-semibold block uppercase">Device Name</label>
-                        <span class="text-sm text-zinc-200 font-medium">{{ $ticket->destination_device }}</span>
+                @if ($isPublic)
+                    <div class="flex-1 flex flex-col items-center justify-center py-6 text-center relative overflow-hidden">
+                        <!-- Blurred Mock Data Background -->
+                        <div class="filter blur-md select-none opacity-20 pointer-events-none w-full space-y-2">
+                            <div class="h-4 bg-zinc-700 rounded w-3/4 mx-auto"></div>
+                            <div class="h-3 bg-zinc-700 rounded w-5/6 mx-auto"></div>
+                        </div>
+                        
+                        <!-- Lock Centered Overlay -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center p-4">
+                            <div class="w-8 h-8 rounded-full bg-zinc-850 border border-zinc-805 flex items-center justify-center text-zinc-400 mb-1.5 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold text-zinc-300">Technical Data Locked</span>
+                            <p class="text-[10px] text-zinc-500 mt-0.5 max-w-[200px]">Sign in to view equipment name and Tenant ID.</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs text-zinc-500 font-semibold block uppercase">Tenant ID</label>
-                        <span class="text-xs font-mono bg-zinc-950/70 border border-zinc-800/80 px-2 py-1 rounded select-all text-zinc-300 block overflow-ellipsis truncate" title="{{ $ticket->destination_tenant_id }}">
-                            {{ $ticket->destination_tenant_id }}
-                        </span>
+                @else
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-zinc-500 font-semibold block uppercase">Device Name</label>
+                            <span class="text-sm text-zinc-200 font-medium">{{ $ticket->destination_device }}</span>
+                        </div>
+                        <div>
+                            <label class="text-xs text-zinc-500 font-semibold block uppercase">Tenant ID</label>
+                            <span class="text-xs font-mono bg-zinc-950/70 border border-zinc-800/80 px-2 py-1 rounded select-all text-zinc-300 block overflow-ellipsis truncate" title="{{ $ticket->destination_tenant_id }}">
+                                {{ $ticket->destination_tenant_id }}
+                            </span>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
 
             <!-- Cable details Card -->
@@ -346,80 +403,123 @@
                     </div>
                 </div>
                 
-                <div class="space-y-4 flex-1">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs text-zinc-500 font-semibold block uppercase">Connector Type</label>
-                            <span class="text-sm font-semibold text-zinc-100">{{ $ticket->connector_type }}</span>
+                @if ($isPublic)
+                    <div class="flex-1 flex flex-col items-center justify-center py-6 text-center relative overflow-hidden">
+                        <!-- Blurred Mock Data Background -->
+                        <div class="filter blur-md select-none opacity-20 pointer-events-none w-full space-y-2">
+                            <div class="h-4 bg-zinc-700 rounded w-3/4 mx-auto"></div>
+                            <div class="h-3 bg-zinc-700 rounded w-5/6 mx-auto"></div>
                         </div>
-                        <div>
-                            <label class="text-xs text-zinc-500 font-semibold block uppercase">Deployment Mode</label>
-                            <span class="text-sm text-zinc-300">Fiber Optic</span>
+                        
+                        <!-- Lock Centered Overlay -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center p-4">
+                            <div class="w-8 h-8 rounded-full bg-zinc-850 border border-zinc-805 flex items-center justify-center text-zinc-400 mb-1.5 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold text-zinc-300">Technical Data Locked</span>
+                            <p class="text-[10px] text-zinc-500 mt-0.5 max-w-[200px]">Sign in to view connector types and cable specs.</p>
                         </div>
                     </div>
-                    
-                    <div class="bg-zinc-950/50 rounded-xl p-3 border border-zinc-800">
-                        <label class="text-xs text-zinc-500 font-semibold block uppercase mb-1">JSON Metadata Details</label>
-                        <pre class="text-xs font-mono text-emerald-400 overflow-x-auto select-all p-1 whitespace-pre-wrap">{{ json_encode($ticket->cable_details ?? [], JSON_PRETTY_PRINT) }}</pre>
+                @else
+                    <div class="space-y-4 flex-1">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-zinc-500 font-semibold block uppercase">Connector Type</label>
+                                <span class="text-sm font-semibold text-zinc-100">{{ $ticket->connector_type }}</span>
+                            </div>
+                            <div>
+                                <label class="text-xs text-zinc-500 font-semibold block uppercase">Deployment Mode</label>
+                                <span class="text-sm text-zinc-300">Fiber Optic</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-zinc-950/50 rounded-xl p-3 border border-zinc-800">
+                            <label class="text-xs text-zinc-500 font-semibold block uppercase mb-1">JSON Metadata Details</label>
+                            <pre class="text-xs font-mono text-emerald-400 overflow-x-auto select-all p-1 whitespace-pre-wrap">{{ json_encode($ticket->cable_details ?? [], JSON_PRETTY_PRINT) }}</pre>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         </section>
 
         <!-- Audit log History Table -->
-        <section class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 shadow-xl">
+        <section class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 shadow-xl min-h-[220px] flex flex-col">
             <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
                 <span class="w-2 h-5 rounded bg-violet-600 inline-block"></span>
                 Audit logs & Transition History
             </h2>
             
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-left">
-                    <thead>
-                        <tr class="border-b border-zinc-800 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                            <th class="py-3 px-4">From State</th>
-                            <th class="py-3 px-4">To State</th>
-                            <th class="py-3 px-4">Executor</th>
-                            <th class="py-3 px-4">Role</th>
-                            <th class="py-3 px-4 text-right">Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-800/60 text-sm text-zinc-300">
-                        @forelse($ticket->logs as $log)
-                        <tr class="hover:bg-zinc-800/25 transition-colors duration-200">
-                            <td class="py-3 px-4">
-                                <span class="text-zinc-400 font-medium capitalize" x-text="'{{ $log->from_state }}'.replace('_', ' ')"></span>
-                            </td>
-                            <td class="py-3 px-4">
-                                <span class="text-zinc-100 font-semibold capitalize" x-text="'{{ $log->to_state }}'.replace('_', ' ')"></span>
-                            </td>
-                            <td class="py-3 px-4 font-medium text-zinc-200">
-                                {{ $log->user->name ?? 'System' }}
-                            </td>
-                            <td class="py-3 px-4">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border capitalize" 
-                                      :class="{
-                                          'bg-violet-500/10 text-violet-400 border-violet-500/20': '{{ $log->user->role ?? '' }}' === 'admin',
-                                          'bg-cyan-500/10 text-cyan-400 border-cyan-500/20': '{{ $log->user->role ?? '' }}' === 'dest_manager',
-                                          'bg-zinc-500/10 text-zinc-400 border-zinc-500/20': '{{ $log->user->role ?? '' }}' === 'staff'
-                                      }">
-                                    {{ str_replace('_', ' ', $log->user->role ?? 'system') }}
-                                </span>
-                            </td>
-                            <td class="py-3 px-4 text-right text-zinc-500">
-                                {{ $log->created_at->format('d M Y - H:i:s') }}
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="py-8 text-center text-zinc-500">
-                                No logs recorded yet for this ticket.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            @if ($isPublic)
+                <div class="flex-1 flex flex-col items-center justify-center py-8 text-center relative overflow-hidden">
+                    <!-- Blurred Mock Table Background -->
+                    <div class="filter blur-md select-none opacity-20 pointer-events-none w-full max-w-md space-y-3">
+                        <div class="h-4 bg-zinc-700 rounded"></div>
+                        <div class="h-4 bg-zinc-700 rounded w-11/12 mx-auto"></div>
+                        <div class="h-4 bg-zinc-700 rounded w-10/12 mx-auto"></div>
+                    </div>
+                    
+                    <!-- Lock Centered Overlay -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center p-4">
+                        <div class="w-10 h-10 rounded-full bg-zinc-850 border border-zinc-805 flex items-center justify-center text-zinc-400 mb-2 shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                        </div>
+                        <span class="text-sm font-semibold text-zinc-300">Audit logs Locked</span>
+                        <p class="text-xs text-zinc-500 mt-1 max-w-xs">Sign in to view the complete history of state transitions and operators.</p>
+                    </div>
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left">
+                        <thead>
+                            <tr class="border-b border-zinc-800 text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                                <th class="py-3 px-4">From State</th>
+                                <th class="py-3 px-4">To State</th>
+                                <th class="py-3 px-4">Executor</th>
+                                <th class="py-3 px-4">Role</th>
+                                <th class="py-3 px-4 text-right">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-800/60 text-sm text-zinc-300">
+                            @forelse($ticket->logs as $log)
+                            <tr class="hover:bg-zinc-800/25 transition-colors duration-200">
+                                <td class="py-3 px-4">
+                                    <span class="text-zinc-400 font-medium capitalize" x-text="'{{ $log->from_state }}'.replace('_', ' ')"></span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="text-zinc-100 font-semibold capitalize" x-text="'{{ $log->to_state }}'.replace('_', ' ')"></span>
+                                </td>
+                                <td class="py-3 px-4 font-medium text-zinc-200">
+                                    {{ $log->user->name ?? 'System' }}
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border capitalize" 
+                                          :class="{
+                                              'bg-violet-500/10 text-violet-400 border-violet-500/20': '{{ $log->user->role ?? '' }}' === 'admin',
+                                              'bg-cyan-500/10 text-cyan-400 border-cyan-500/20': '{{ $log->user->role ?? '' }}' === 'dest_manager',
+                                              'bg-zinc-500/10 text-zinc-400 border-zinc-500/20': '{{ $log->user->role ?? '' }}' === 'staff'
+                                          }">
+                                        {{ str_replace('_', ' ', $log->user->role ?? 'system') }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-right text-zinc-500">
+                                    {{ $log->created_at->format('d M Y - H:i:s') }}
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="py-8 text-center text-zinc-500">
+                                    No logs recorded yet for this ticket.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </section>
         
     </main>

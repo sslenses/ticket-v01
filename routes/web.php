@@ -10,12 +10,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
+// Publicly Accessible Ticket Detail Route (Read-Only/Simplified for Guests)
+Route::get('/tickets/{ticket}', [TicketController::class, 'show']);
+
 // Protected Authenticated Routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/', [TicketController::class, 'index']);
-    Route::get('/tickets/{ticket}', [TicketController::class, 'show']);
 
     Route::prefix('api')->group(function () {
         Route::post('/tickets', [TicketController::class, 'store']);
