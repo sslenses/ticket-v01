@@ -34,6 +34,7 @@
       x-data="{ 
           showCreateModal: false,
           searchQuery: '',
+          activeStatusFilter: 'all',
           tickets: [
               @foreach($tickets as $ticket)
               {
@@ -48,9 +49,18 @@
               @endforeach
           ],
           filteredTickets() {
-              if (!this.searchQuery) return this.tickets;
+              let filtered = this.tickets;
+              if (this.activeStatusFilter === 'waiting_destination') {
+                  filtered = filtered.filter(t => t.status === 'waiting_destination');
+              } else if (this.activeStatusFilter === 'in_progress') {
+                  filtered = filtered.filter(t => t.status !== 'waiting_destination' && t.status !== 'done');
+              } else if (this.activeStatusFilter === 'completed') {
+                  filtered = filtered.filter(t => t.status === 'done');
+              }
+
+              if (!this.searchQuery) return filtered;
               const q = this.searchQuery.toLowerCase();
-              return this.tickets.filter(t => 
+              return filtered.filter(t => 
                   t.label.toLowerCase().includes(q) ||
                   t.source.toLowerCase().includes(q) ||
                   t.destination.toLowerCase().includes(q) ||
@@ -176,27 +186,51 @@
 
         <!-- Statistics Panel -->
         <section class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 backdrop-blur-xl p-5 shadow-md">
-                <span class="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Total Tickets</span>
+            <div @click="activeStatusFilter = 'all'"
+                 class="rounded-2xl border p-5 shadow-md transition-all duration-300 cursor-pointer select-none hover:-translate-y-1 hover:bg-zinc-800/10"
+                 :class="activeStatusFilter === 'all' ? 'border-violet-500/50 bg-violet-500/5 shadow-lg shadow-violet-500/5' : 'border-zinc-800 bg-zinc-900/30'">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-widest"
+                          :class="activeStatusFilter === 'all' ? 'text-violet-400' : 'text-zinc-500'">Total Tickets</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" x-show="activeStatusFilter === 'all'"></span>
+                </div>
                 <span class="text-3xl font-extrabold text-white block mt-1 font-display">{{ $tickets->count() }}</span>
             </div>
             
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 backdrop-blur-xl p-5 shadow-md">
-                <span class="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Waiting Dest</span>
+            <div @click="activeStatusFilter = 'waiting_destination'"
+                 class="rounded-2xl border p-5 shadow-md transition-all duration-300 cursor-pointer select-none hover:-translate-y-1 hover:bg-zinc-800/10"
+                 :class="activeStatusFilter === 'waiting_destination' ? 'border-indigo-500/50 bg-indigo-500/5 shadow-lg shadow-indigo-500/5' : 'border-zinc-800 bg-zinc-900/30'">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-widest"
+                          :class="activeStatusFilter === 'waiting_destination' ? 'text-indigo-400' : 'text-zinc-500'">Waiting Dest</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" x-show="activeStatusFilter === 'waiting_destination'"></span>
+                </div>
                 <span class="text-3xl font-extrabold text-indigo-400 block mt-1 font-display">
                     {{ $tickets->where('status', 'waiting_destination')->count() }}
                 </span>
             </div>
 
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 backdrop-blur-xl p-5 shadow-md">
-                <span class="text-xs font-semibold text-zinc-500 uppercase tracking-widest">In Progress</span>
+            <div @click="activeStatusFilter = 'in_progress'"
+                 class="rounded-2xl border p-5 shadow-md transition-all duration-300 cursor-pointer select-none hover:-translate-y-1 hover:bg-zinc-800/10"
+                 :class="activeStatusFilter === 'in_progress' ? 'border-amber-500/50 bg-amber-500/5 shadow-lg shadow-amber-500/5' : 'border-zinc-800 bg-zinc-900/30'">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-widest"
+                          :class="activeStatusFilter === 'in_progress' ? 'text-amber-400' : 'text-zinc-500'">In Progress</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" x-show="activeStatusFilter === 'in_progress'"></span>
+                </div>
                 <span class="text-3xl font-extrabold text-amber-400 block mt-1 font-display">
                     {{ $tickets->whereNotIn('status', ['waiting_destination', 'done'])->count() }}
                 </span>
             </div>
 
-            <div class="rounded-2xl border border-zinc-800 bg-zinc-900/30 backdrop-blur-xl p-5 shadow-md">
-                <span class="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Completed</span>
+            <div @click="activeStatusFilter = 'completed'"
+                 class="rounded-2xl border p-5 shadow-md transition-all duration-300 cursor-pointer select-none hover:-translate-y-1 hover:bg-zinc-800/10"
+                 :class="activeStatusFilter === 'completed' ? 'border-emerald-500/50 bg-emerald-500/5 shadow-lg shadow-emerald-500/5' : 'border-zinc-800 bg-zinc-900/30'">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-widest"
+                          :class="activeStatusFilter === 'completed' ? 'text-emerald-400' : 'text-zinc-500'">Completed</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" x-show="activeStatusFilter === 'completed'"></span>
+                </div>
                 <span class="text-3xl font-extrabold text-emerald-400 block mt-1 font-display">
                     {{ $tickets->where('status', 'done')->count() }}
                 </span>

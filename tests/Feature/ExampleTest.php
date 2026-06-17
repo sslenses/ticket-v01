@@ -42,5 +42,10 @@ class ExampleTest extends TestCase
         $response->assertSee('placeholder="Search by label, device, or status..."', false);
         $response->assertSee('TICKET-SEARCH-101');
         $response->assertSee('filteredTickets()');
+        $response->assertSee('activeStatusFilter: \'all\'', false);
+        $response->assertSee('@click="activeStatusFilter = \'all\'"', false);
+        $response->assertSee('@click="activeStatusFilter = \'waiting_destination\'"', false);
+        $response->assertSee('@click="activeStatusFilter = \'in_progress\'"', false);
+        $response->assertSee('@click="activeStatusFilter = \'completed\'"', false);
     }
 }
