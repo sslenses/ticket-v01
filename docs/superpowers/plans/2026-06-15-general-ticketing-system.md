@@ -68,7 +68,7 @@ Schema::create('ticket_logs', function (Blueprint $table) {
 });
 ```
 
-- [ ] **Step 3: Run Migrations**
+- [x] **Step 3: Run Migrations**
 Run: `php artisan migrate`
 
 - [x] **Step 4: Commit**
@@ -81,7 +81,7 @@ git commit -m "feat: add migrations for tickets and logs"
 
 ### Task 3: Models & State Logic
 
-- [ ] **Step 1: Define Ticket Model Constants**
+- [x] **Step 1: Define Ticket Model Constants**
 Modify `app/Models/Ticket.php`:
 ```php
 const STATUS_WAITING_DESTINATION = 'waiting_destination';
@@ -92,7 +92,7 @@ const STATUS_RECEIVED_CABLE = 'received_cable';
 const STATUS_DONE = 'done';
 ```
 
-- [ ] **Step 2: Create TicketStateService**
+- [x] **Step 2: Create TicketStateService**
 Create `app/Services/TicketStateService.php`:
 ```php
 namespace App\Services;
@@ -114,7 +114,7 @@ class TicketStateService {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 ```bash
 git add .
 git commit -m "feat: implement state transition service"
@@ -124,7 +124,7 @@ git commit -m "feat: implement state transition service"
 
 ### Task 4: RBAC & Controller
 
-- [ ] **Step 1: Define Policies**
+- [x] **Step 1: Define Policies**
 Run: `php artisan make:policy TicketPolicy --model=Ticket`
 Implement logic for each stage:
 ```php
@@ -133,14 +133,14 @@ public function approveDestination(User $user, Ticket $ticket) {
 }
 ```
 
-- [ ] **Step 2: Create TicketController**
+- [x] **Step 2: Create TicketController**
 Implement `store` and `updateStatus` methods.
 
-- [ ] **Step 3: Write Feature Test (TDD)**
+- [x] **Step 3: Write Feature Test (TDD)**
 Run: `php artisan make:test TicketLifecycleTest`
 Verify creation and forbidden transitions.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 ```bash
 git add .
 git commit -m "feat: add controller and lifecycle tests"
