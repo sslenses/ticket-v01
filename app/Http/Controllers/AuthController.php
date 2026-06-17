@@ -55,4 +55,34 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+
+    /**
+     * Show the registration form.
+     */
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    /**
+     * Handle a registration request.
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'string', 'in:admin,dest_manager,staff,user'],
+        ]);
+
+        \App\Models\User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role' => $request->role,
+        ]);
+
+        return redirect('/login')->with('status', 'Registration successful! Please sign in using your credentials.');
+    }
 }

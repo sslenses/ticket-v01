@@ -50,7 +50,14 @@
         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-tr from-violet-500/5 to-transparent pointer-events-none"></div>
             
-            <!-- Session Status / Validation Errors -->
+            <!-- Session Status / Validation Errors / Success Status -->
+            @if (session('status'))
+                <div class="mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl p-3.5 flex flex-col gap-1">
+                    <span class="font-bold">Success:</span>
+                    <p>{{ session('status') }}</p>
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="mb-5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl p-3.5 flex flex-col gap-1">
                     <span class="font-bold">Login Failed:</span>
@@ -90,6 +97,11 @@
                     Sign In
                 </button>
             </form>
+        </div>
+
+        <div class="text-center text-xs text-zinc-500">
+            Don't have an account? 
+            <a href="/register" class="text-violet-400 hover:text-violet-300 font-semibold transition-colors">Sign Up</a>
         </div>
 
         <!-- Dev Sandbox Accounts Helper -->

@@ -145,4 +145,74 @@ class AuthTest extends TestCase
         $response->assertSee($ticket->source_device);
         $response->assertDontSee('Technical Data Locked');
     }
+
+    /**
+     * Test that register page renders successfully.
+     */
+    public function test_register_page_renders_successfully(): void
+    {
+        $response = $this->get('/register');
+        $response->assertStatus(200);
+        $response->assertSee('Create Account');
+    }
+
+    /**
+     * Test successful registration with valid details and role.
+     */
+    public function test_user_can_register_with_valid_details_and_role(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'dest_manager',
+        ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHas('status', 'Registration successful! Please sign in using your credentials.');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'newuser@example.com',
+            'role' => 'dest_manager',
+        ]);
+    }
+
+    /**
+     * Test registration fails with invalid role.
+     */
+    public function test_user_cannot_register_with_invalid_role(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'invalid_role',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertDatabaseMissing('users', [
+            'email' => 'newuser@example.com',
+        ]);
+    }
+
+    /**
+     * Test registration fails with mismatched passwords.
+     */
+    public function test_user_cannot_register_with_mismatched_password(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'different_password',
+            'role' => 'staff',
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $this->assertDatabaseMissing('users', [
+            'email' => 'newuser@example.com',
+        ]);
+    }
 }
