@@ -212,10 +212,10 @@
             
             <div class="relative flex flex-col md:flex-row md:items-start md:justify-between gap-y-12 md:gap-y-0 px-4 md:px-0">
                 <!-- Running Line Background (Desktop) -->
-                <div class="hidden md:block absolute top-[18px] left-[5%] right-[5%] h-1 bg-zinc-800 rounded-full z-0">
+                <div class="hidden md:block absolute top-[18px] left-[20px] right-[20px] h-1 bg-zinc-800 rounded-full z-0">
                     <!-- Progress Fill Line -->
                     <div class="h-full bg-gradient-to-r from-violet-600 via-indigo-600 to-emerald-500 rounded-full transition-all duration-700 ease-out"
-                         :style="{ width: (getStageIndex(currentStatus) / (stages.length - 1)) * 90 + '%' }"></div>
+                         :style="{ width: (getStageIndex(currentStatus) / (stages.length - 1)) * 100 + '%' }"></div>
                 </div>
 
                 <template x-for="(stage, index) in stages" :key="stage.key">
