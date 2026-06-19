@@ -29,8 +29,9 @@ class FakeConnection extends \Illuminate\Database\SQLiteConnection
         $rows = self::$mockDatabase[$table] ?? [];
         
         $cleanQuery = str_replace(['"', '`'], '', $query);
-        preg_match_all('/([\w.]+)\s*=\s*\?/i', $cleanQuery, $matches);
+        preg_match_all('/([\w.]+)\s*(=|<>|!=)\s*\?/i', $cleanQuery, $matches);
         $columns = $matches[1] ?? [];
+        $operators = $matches[2] ?? [];
         
         if (empty($columns)) {
             return $rows;
@@ -44,9 +45,24 @@ class FakeConnection extends \Illuminate\Database\SQLiteConnection
                 $colName = end($parts);
                 
                 $bindingValue = $bindings[$index] ?? null;
-                if (!isset($row[$colName]) || $row[$colName] != $bindingValue) {
+                $operator = $operators[$index] ?? '=';
+                
+                if (!isset($row[$colName])) {
                     $match = false;
                     break;
+                }
+                
+                $rowValue = $row[$colName];
+                if ($operator === '=' || $operator === '==') {
+                    if ($rowValue != $bindingValue) {
+                        $match = false;
+                        break;
+                    }
+                } elseif ($operator === '<>' || $operator === '!=') {
+                    if ($rowValue == $bindingValue) {
+                        $match = false;
+                        break;
+                    }
                 }
             }
             if ($match) {
@@ -161,6 +177,53 @@ class FakeConnection extends \Illuminate\Database\SQLiteConnection
     public function delete($query, $bindings = [])
     {
         self::$logs[] = ['type' => 'delete', 'query' => $query, 'bindings' => $bindings];
+
+        preg_match('/delete from\s+["`]?(\w+)["`]?/i', $query, $matches);
+        $table = $matches[1] ?? null;
+
+        if ($table && isset(self::$mockDatabase[$table])) {
+            $cleanQuery = str_replace(['"', '`'], '', $query);
+            preg_match_all('/([\w.]+)\s*(=|<>|!=)\s*\?/i', $cleanQuery, $matches);
+            $columns = $matches[1] ?? [];
+            $operators = $matches[2] ?? [];
+
+            self::$mockDatabase[$table] = array_filter(self::$mockDatabase[$table], function($row) use ($columns, $operators, $bindings) {
+                if (empty($columns)) {
+                    return true;
+                }
+                
+                $match = true;
+                foreach ($columns as $index => $col) {
+                    $parts = explode('.', $col);
+                    $colName = end($parts);
+                    
+                    $bindingValue = $bindings[$index] ?? null;
+                    $operator = $operators[$index] ?? '=';
+                    
+                    if (!isset($row[$colName])) {
+                        $match = false;
+                        break;
+                    }
+                    
+                    $rowValue = $row[$colName];
+                    if ($operator === '=' || $operator === '==') {
+                        if ($rowValue != $bindingValue) {
+                            $match = false;
+                            break;
+                        }
+                    } elseif ($operator === '<>' || $operator === '!=') {
+                        if ($rowValue == $bindingValue) {
+                            $match = false;
+                            break;
+                        }
+                    }
+                }
+                return !$match;
+            });
+
+            self::$mockDatabase[$table] = array_values(self::$mockDatabase[$table]);
+        }
+
         return 1;
     }
 

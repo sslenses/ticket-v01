@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Ticketing System</title>
+    <title>Login - Technical Ticket Network</title>
     
     <!-- Google Fonts: Inter & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,17 @@
         h1, h2, h3, .font-display {
             font-family: 'Outfit', sans-serif;
         }
+        @keyframes signal-flow {
+            to {
+                stroke-dashoffset: -20;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 p-4 md:p-6 transition-colors duration-300 relative"
       x-data="{
           email: '',
-          password: '',
-          autofill(testEmail) {
-              this.email = testEmail;
-              this.password = 'password';
-          }
+          password: ''
       }">
 
     <!-- Top Right Theme Switcher -->
@@ -65,8 +66,30 @@
         
         <!-- Logo Header -->
         <div class="flex flex-col items-center gap-2 text-center">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-display font-bold text-2xl text-white shadow-lg shadow-violet-500/10 dark:shadow-none">
-                T
+            <div class="relative w-12 h-12 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shadow-md hover:border-red-500/50 transition-all duration-300 group">
+                <!-- Glow background -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-red-600/10 to-rose-600/10 dark:from-red-600/20 dark:to-rose-600/20 rounded-xl blur-sm opacity-50 group-hover:opacity-100 group-hover:blur-md transition-all duration-300"></div>
+                
+                <!-- Logo Graphic -->
+                <svg class="relative w-8 h-8 text-red-600 dark:text-red-400 group-hover:text-rose-500 dark:group-hover:text-rose-300 transition-colors duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Connecting Fiber Lines -->
+                    <path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-30" />
+                    <path d="M12 6v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-30" />
+                    
+                    <!-- Animated Signal dashes -->
+                    <path d="M4 6h16" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" class="signal-line" style="stroke-dasharray: 4, 12; animation: signal-flow 2s linear infinite;" />
+                    <path d="M12 6v12" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" class="signal-line" style="stroke-dasharray: 4, 12; animation: signal-flow 2s linear infinite;" />
+
+                    <!-- Network Node Circles -->
+                    <circle cx="4" cy="6" r="2" fill="currentColor" />
+                    <circle cx="20" cy="6" r="2" fill="currentColor" />
+                    <circle cx="12" cy="18" r="2" fill="currentColor" />
+                    
+                    <!-- Glowing Pulsing Core -->
+                    <circle cx="12" cy="6" r="3.5" fill="#f87171" class="animate-ping opacity-75" />
+                    <circle cx="12" cy="6" r="3.5" fill="#ef4444" />
+                    <circle cx="12" cy="6" r="1.5" fill="#ffffff" />
+                </svg>
             </div>
             <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mt-2">Welcome Back</h1>
             <p class="text-zinc-550 dark:text-zinc-500 text-sm">Log in to manage your connection and deployment tickets</p>
@@ -74,7 +97,7 @@
 
         <!-- Login Card -->
         <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-xl p-6 md:p-8 shadow-xl dark:shadow-2xl relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-tr from-violet-500/5 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-tr from-red-500/5 to-transparent pointer-events-none"></div>
             
             <!-- Session Status / Validation Errors / Success Status -->
             @if (session('status'))
@@ -85,7 +108,7 @@
             @endif
 
             @if ($errors->any())
-                <div class="mb-5 bg-red-500/10 border border-red-500/20 text-red-650 dark:text-red-400 text-xs rounded-xl p-3.5 flex flex-col gap-1">
+                <div class="mb-5 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-xl p-3.5 flex flex-col gap-1">
                     <span class="font-bold">Login Failed:</span>
                     <ul class="list-disc pl-4 space-y-0.5">
                         @foreach ($errors->all() as $error)
@@ -100,72 +123,44 @@
                 <div>
                     <label for="email" class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block mb-1">Email Address</label>
                     <input type="email" id="email" name="email" x-model="email" required autofocus placeholder="name@example.com"
-                           class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-violet-600 dark:focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors">
+                           class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-red-600 dark:focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors">
                 </div>
 
-                <div>
+                <div x-data="{ showPassword: false }">
                     <div class="flex items-center justify-between mb-1">
                         <label for="password" class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block">Password</label>
                     </div>
-                    <input type="password" id="password" name="password" x-model="password" required placeholder="••••••••"
-                           class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-violet-600 dark:focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors">
+                    <div class="relative">
+                        <input :type="showPassword ? 'text' : 'password'" id="password" name="password" x-model="password" required placeholder="••••••••"
+                               class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-4 pr-11 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-red-600 dark:focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors">
+                        <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400 focus:outline-none cursor-pointer">
+                            <!-- Eye icon (shown when password is hidden) -->
+                            <svg x-show="!showPassword" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            <!-- Eye slash icon (shown when password is visible) -->
+                            <svg x-show="showPassword" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="display: none;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
                     <label class="flex items-center text-xs text-zinc-650 dark:text-zinc-400 cursor-pointer select-none">
-                        <input type="checkbox" name="remember" class="mr-2 rounded border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-violet-600 focus:ring-violet-600">
+                        <input type="checkbox" name="remember" class="mr-2 rounded border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-red-600 focus:ring-red-600">
                         Remember me
                     </label>
                 </div>
 
                 <button type="submit"
-                        class="w-full bg-violet-600 hover:bg-violet-750 dark:hover:bg-violet-500 active:scale-[0.98] text-sm font-semibold text-white py-3 rounded-xl transition-all shadow-lg shadow-violet-600/10 cursor-pointer mt-2">
+                        class="w-full bg-red-600 hover:bg-red-750 dark:hover:bg-red-500 active:scale-[0.98] text-sm font-semibold text-white py-3 rounded-xl transition-all shadow-lg shadow-red-600/10 cursor-pointer mt-2">
                     Sign In
                 </button>
             </form>
         </div>
 
-        <div class="text-center text-xs text-zinc-500">
-            Don't have an account? 
-            <a href="/register" class="text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 font-semibold transition-colors">Sign Up</a>
-        </div>
-
-        <!-- Dev Sandbox Accounts Helper -->
-        <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/10 backdrop-blur-sm p-5 flex flex-col gap-3">
-            <div>
-                <span class="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest">Test Accounts (RBAC Roles)</span>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Click any account below to autofill, then click Sign In.</p>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 text-xs">
-                <button @click="autofill('admin@example.com')" 
-                        class="bg-white dark:bg-zinc-900/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 text-left p-2.5 rounded-xl transition-colors cursor-pointer group flex flex-col shadow-sm">
-                    <span class="font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">Admin Account</span>
-                    <span class="text-[10px] text-zinc-500 font-mono mt-0.5">admin@example.com</span>
-                </button>
-                <button @click="autofill('manager@example.com')" 
-                        class="bg-white dark:bg-zinc-900/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 text-left p-2.5 rounded-xl transition-colors cursor-pointer group flex flex-col shadow-sm">
-                    <span class="font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">Dest Manager</span>
-                    <span class="text-[10px] text-zinc-500 font-mono mt-0.5">manager@example.com</span>
-                </button>
-                <button @click="autofill('staff@example.com')" 
-                        class="bg-white dark:bg-zinc-900/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 text-left p-2.5 rounded-xl transition-colors cursor-pointer group flex flex-col shadow-sm">
-                    <span class="font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Staff Account</span>
-                    <span class="text-[10px] text-zinc-500 font-mono mt-0.5">staff@example.com</span>
-                </button>
-                <button @click="autofill('user@example.com')" 
-                        class="bg-white dark:bg-zinc-900/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-800 text-left p-2.5 rounded-xl transition-colors cursor-pointer group flex flex-col shadow-sm">
-                    <span class="font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-600 dark:group-hover:text-zinc-400 transition-colors">User Account</span>
-                    <span class="text-[10px] text-zinc-500 font-mono mt-0.5">user@example.com</span>
-                </button>
-            </div>
-            
-            <div class="border-t border-zinc-200/80 dark:border-zinc-800/50 pt-2 text-[10px] text-zinc-500 flex justify-between">
-                <span>Default Password:</span>
-                <span class="font-mono text-zinc-700 dark:text-zinc-400">password</span>
-            </div>
-        </div>
-        
     </div>
 
 </body>

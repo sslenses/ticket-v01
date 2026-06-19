@@ -147,73 +147,88 @@ class AuthTest extends TestCase
     }
 
     /**
-     * Test that register page renders successfully.
+     * Test that register page is no longer accessible.
      */
-    public function test_register_page_renders_successfully(): void
+    public function test_register_page_is_disabled(): void
     {
         $response = $this->get('/register');
-        $response->assertStatus(200);
-        $response->assertSee('Create Account');
+        $response->assertStatus(404);
     }
 
     /**
-     * Test successful registration with valid details and role.
+     * Test that admin can create a user.
      */
-    public function test_user_can_register_with_valid_details_and_role(): void
+    public function test_admin_can_create_user(): void
     {
-        $response = $this->post('/register', [
-            'name' => 'New User',
-            'email' => 'newuser@example.com',
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->postJson('/api/users', [
+            'name' => 'New Staff Member',
+            'email' => 'newstaff@example.com',
+            'role' => 'staff',
             'password' => 'password123',
-            'password_confirmation' => 'password123',
-            'role' => 'dest_manager',
         ]);
 
-        $response->assertRedirect('/login');
-        $response->assertSessionHas('status', 'Registration successful! Please sign in using your credentials.');
-
+        $response->assertStatus(201);
         $this->assertDatabaseHas('users', [
-            'email' => 'newuser@example.com',
-            'role' => 'dest_manager',
-        ]);
-    }
-
-    /**
-     * Test registration fails with invalid role.
-     */
-    public function test_user_cannot_register_with_invalid_role(): void
-    {
-        $response = $this->post('/register', [
-            'name' => 'New User',
-            'email' => 'newuser@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-            'role' => 'invalid_role',
-        ]);
-
-        $response->assertSessionHasErrors('role');
-        $this->assertDatabaseMissing('users', [
-            'email' => 'newuser@example.com',
-        ]);
-    }
-
-    /**
-     * Test registration fails with mismatched passwords.
-     */
-    public function test_user_cannot_register_with_mismatched_password(): void
-    {
-        $response = $this->post('/register', [
-            'name' => 'New User',
-            'email' => 'newuser@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'different_password',
+            'name' => 'New Staff Member',
+            'email' => 'newstaff@example.com',
             'role' => 'staff',
         ]);
+    }
 
-        $response->assertSessionHasErrors('password');
-        $this->assertDatabaseMissing('users', [
-            'email' => 'newuser@example.com',
+    /**
+     * Test that user creation validates email uniqueness.
+     */
+    public function test_admin_cannot_create_user_with_duplicate_email(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        User::factory()->create(['email' => 'duplicate@example.com']);
+
+        $response = $this->actingAs($admin)->postJson('/api/users', [
+            'name' => 'Duplicate Email User',
+            'email' => 'duplicate@example.com',
+            'role' => 'staff',
+            'password' => 'password123',
         ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('email');
+    }
+
+    /**
+     * Test that dest_manager cannot create a user.
+     */
+    public function test_dest_manager_cannot_create_user(): void
+    {
+        $destManager = User::factory()->create(['role' => 'dest_manager']);
+
+        $response = $this->actingAs($destManager)->postJson('/api/users', [
+            'name' => 'Unauthorized User',
+            'email' => 'unauthorized@example.com',
+            'role' => 'staff',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('users', ['email' => 'unauthorized@example.com']);
+    }
+
+    /**
+     * Test that unauthorized roles cannot create a user.
+     */
+    public function test_staff_cannot_create_user(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+
+        $response = $this->actingAs($staff)->postJson('/api/users', [
+            'name' => 'Unauthorized User',
+            'email' => 'unauthorized@example.com',
+            'role' => 'staff',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(403);
     }
 
     /**
@@ -247,5 +262,114 @@ class AuthTest extends TestCase
         $response = $this->actingAs($admin)->get('/users');
         $response->assertStatus(200);
         $response->assertSee('John Staff');
+    }
+
+    /**
+     * Test that dest_manager users can access the user list.
+     */
+    public function test_dest_manager_user_can_access_user_list(): void
+    {
+        $destManager = User::factory()->create(['role' => 'dest_manager']);
+        $user = User::factory()->create(['role' => 'staff', 'name' => 'John Staff']);
+
+        $response = $this->actingAs($destManager)->get('/users');
+        $response->assertStatus(200);
+        $response->assertSee('John Staff');
+    }
+
+    /**
+     * Test that dest_manager can edit users but cannot edit admin or change roles.
+     */
+    public function test_dest_manager_can_edit_users_with_restrictions(): void
+    {
+        $destManager = User::factory()->create(['role' => 'dest_manager']);
+        $targetUser = User::factory()->create(['role' => 'staff', 'name' => 'Original Name', 'email' => 'original@example.com']);
+        $adminUser = User::factory()->create(['role' => 'admin', 'name' => 'Admin Name']);
+
+        // Can edit staff name and email
+        $response = $this->actingAs($destManager)->patchJson("/api/users/{$targetUser->id}", [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+        ]);
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'id' => $targetUser->id,
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+            'role' => 'staff',
+        ]);
+
+        // Cannot change role (dest_manager role input is ignored)
+        $response = $this->actingAs($destManager)->patchJson("/api/users/{$targetUser->id}", [
+            'name' => 'Updated Name Again',
+            'email' => 'updated@example.com',
+            'role' => 'admin',
+        ]);
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'id' => $targetUser->id,
+            'role' => 'staff',
+        ]);
+
+        // Cannot edit admin user
+        $response = $this->actingAs($destManager)->patchJson("/api/users/{$adminUser->id}", [
+            'name' => 'Hacked Admin Name',
+            'email' => 'hacked@example.com',
+        ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test that dest_manager cannot delete users.
+     */
+    public function test_dest_manager_cannot_delete_users(): void
+    {
+        $destManager = User::factory()->create(['role' => 'dest_manager']);
+        $targetUser = User::factory()->create(['role' => 'staff']);
+
+        $response = $this->actingAs($destManager)->deleteJson("/api/users/{$targetUser->id}");
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', ['id' => $targetUser->id]);
+    }
+
+    /**
+     * Test that admin can edit any user's details and roles.
+     */
+    public function test_admin_can_edit_any_user_and_role(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $targetUser = User::factory()->create(['role' => 'staff', 'name' => 'Original Name']);
+
+        $response = $this->actingAs($admin)->patchJson("/api/users/{$targetUser->id}", [
+            'name' => 'Updated Name By Admin',
+            'email' => 'updatedbyadmin@example.com',
+            'role' => 'dest_manager',
+        ]);
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'id' => $targetUser->id,
+            'name' => 'Updated Name By Admin',
+            'email' => 'updatedbyadmin@example.com',
+            'role' => 'dest_manager',
+        ]);
+    }
+
+    /**
+     * Test that admin can delete users but cannot delete themselves.
+     */
+    public function test_admin_can_delete_users_but_not_self(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $targetUser = User::factory()->create(['role' => 'staff']);
+
+        // Can delete other user
+        $response = $this->actingAs($admin)->deleteJson("/api/users/{$targetUser->id}");
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
+
+        // Cannot delete self
+        $response = $this->actingAs($admin)->deleteJson("/api/users/{$admin->id}");
+        $response->assertStatus(422);
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
     }
 }
