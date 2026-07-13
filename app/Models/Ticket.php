@@ -46,4 +46,48 @@ class Ticket extends Model
             'cable_details' => 'array',
         ];
     }
+
+    /**
+     * Get a nested value from cable_details array safely.
+     */
+    public function getCableDetail(string $key, $default = '')
+    {
+        return is_array($this->cable_details) ? ($this->cable_details[$key] ?? $default) : $default;
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::creating(function ($ticket) {
+            if (empty($ticket->uuid)) {
+                $ticket->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if (!\Illuminate\Support\Str::isUuid($value)) {
+            return null;
+        }
+
+        return parent::resolveRouteBinding($value, $field);
+    }
 }

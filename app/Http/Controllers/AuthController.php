@@ -68,7 +68,7 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'role' => ['required', 'string', 'in:admin,dest_manager,staff,user'],
+            'role' => ['required', 'string', 'in:admin,dest_manager,teknisi,user'],
             'password' => ['required', 'string', 'min:8'],
         ]);
 
@@ -87,8 +87,8 @@ class AuthController extends Controller
      */
     public function userList()
     {
-        if (!auth()->user()->hasRole('admin') && !auth()->user()->hasRole('dest_manager')) {
-            abort(403, 'Unauthorized. Only administrators and destination managers can access the user list.');
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized. Only administrators can access the user list.');
         }
 
         $users = \App\Models\User::oldest()->get();
@@ -100,13 +100,8 @@ class AuthController extends Controller
      */
     public function update(Request $request, \App\Models\User $user)
     {
-        if (!auth()->user()->hasRole('admin') && !auth()->user()->hasRole('dest_manager')) {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403, 'Unauthorized');
-        }
-
-        // dest_manager cannot edit admin
-        if (auth()->user()->hasRole('dest_manager') && $user->hasRole('admin')) {
-            abort(403, 'Unauthorized. Destination managers cannot edit administrators.');
         }
 
         $rules = [
@@ -116,7 +111,7 @@ class AuthController extends Controller
         ];
 
         if (auth()->user()->hasRole('admin')) {
-            $rules['role'] = ['required', 'string', 'in:admin,dest_manager,staff,user'];
+            $rules['role'] = ['required', 'string', 'in:admin,dest_manager,teknisi,user'];
         }
 
         $data = $request->validate($rules);

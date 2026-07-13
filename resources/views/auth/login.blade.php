@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" x-data="{ theme: localStorage.getItem('theme') || 'dark' }" :class="theme" class="h-full antialiased">
 <head>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark'); // default
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Technical Ticket Network</title>
+    <title>Technical Ticket Network - Log In</title>
+    <link rel="icon" type="image/x-icon" href="https://github.githubassets.com/favicon.ico">
     
     <!-- Google Fonts: Inter & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,33 +76,12 @@
         
         <!-- Logo Header -->
         <div class="flex flex-col items-center gap-2 text-center">
-            <div class="relative w-12 h-12 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shadow-md hover:border-red-500/50 transition-all duration-300 group">
-                <!-- Glow background -->
-                <div class="absolute inset-0 bg-gradient-to-tr from-red-600/10 to-rose-600/10 dark:from-red-600/20 dark:to-rose-600/20 rounded-xl blur-sm opacity-50 group-hover:opacity-100 group-hover:blur-md transition-all duration-300"></div>
-                
-                <!-- Logo Graphic -->
-                <svg class="relative w-8 h-8 text-red-600 dark:text-red-400 group-hover:text-rose-500 dark:group-hover:text-rose-300 transition-colors duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Connecting Fiber Lines -->
-                    <path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-30" />
-                    <path d="M12 6v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="opacity-30" />
-                    
-                    <!-- Animated Signal dashes -->
-                    <path d="M4 6h16" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" class="signal-line" style="stroke-dasharray: 4, 12; animation: signal-flow 2s linear infinite;" />
-                    <path d="M12 6v12" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" class="signal-line" style="stroke-dasharray: 4, 12; animation: signal-flow 2s linear infinite;" />
-
-                    <!-- Network Node Circles -->
-                    <circle cx="4" cy="6" r="2" fill="currentColor" />
-                    <circle cx="20" cy="6" r="2" fill="currentColor" />
-                    <circle cx="12" cy="18" r="2" fill="currentColor" />
-                    
-                    <!-- Glowing Pulsing Core -->
-                    <circle cx="12" cy="6" r="3.5" fill="#f87171" class="animate-ping opacity-75" />
-                    <circle cx="12" cy="6" r="3.5" fill="#ef4444" />
-                    <circle cx="12" cy="6" r="1.5" fill="#ffffff" />
-                </svg>
+            <div class="relative flex items-center justify-center transition-all duration-300 group">
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="dark:hidden relative w-28 h-28 md:w-32 md:h-32 object-contain z-10 transition-transform duration-300 group-hover:scale-105">
+                <img src="{{ asset('logob.png') }}" alt="Logo" class="hidden dark:block relative w-28 h-28 md:w-32 md:h-32 object-contain z-10 transition-transform duration-300 group-hover:scale-105">
             </div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mt-2">Welcome Back</h1>
-            <p class="text-zinc-550 dark:text-zinc-500 text-sm">Log in to manage your connection and deployment tickets</p>
+            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white mt-2">Technical Ticket Network</h1>
+            <p class="text-zinc-550 dark:text-zinc-500 text-sm">Masuk untuk mengelola tiket koneksi dan instalasi Anda</p>
         </div>
 
         <!-- Login Card -->
@@ -102,14 +91,14 @@
             <!-- Session Status / Validation Errors / Success Status -->
             @if (session('status'))
                 <div class="mb-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs rounded-xl p-3.5 flex flex-col gap-1">
-                    <span class="font-bold">Success:</span>
+                    <span class="font-bold">Sukses:</span>
                     <p>{{ session('status') }}</p>
                 </div>
             @endif
 
             @if ($errors->any())
                 <div class="mb-5 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-xl p-3.5 flex flex-col gap-1">
-                    <span class="font-bold">Login Failed:</span>
+                    <span class="font-bold">Gagal Masuk:</span>
                     <ul class="list-disc pl-4 space-y-0.5">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -121,14 +110,14 @@
             <form method="POST" action="/login" class="space-y-4">
                 @csrf
                 <div>
-                    <label for="email" class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block mb-1">Email Address</label>
-                    <input type="email" id="email" name="email" x-model="email" required autofocus placeholder="name@example.com"
+                    <label for="email" class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block mb-1">Alamat Email</label>
+                    <input type="email" id="email" name="email" x-model="email" required autofocus placeholder="nama@contoh.com"
                            class="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-red-600 dark:focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors">
                 </div>
 
                 <div x-data="{ showPassword: false }">
                     <div class="flex items-center justify-between mb-1">
-                        <label for="password" class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block">Password</label>
+                        <label for="password" class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block">Kata Sandi</label>
                     </div>
                     <div class="relative">
                         <input :type="showPassword ? 'text' : 'password'" id="password" name="password" x-model="password" required placeholder="••••••••"
@@ -150,13 +139,13 @@
                 <div class="flex items-center justify-between pt-1">
                     <label class="flex items-center text-xs text-zinc-650 dark:text-zinc-400 cursor-pointer select-none">
                         <input type="checkbox" name="remember" class="mr-2 rounded border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-red-600 focus:ring-red-600">
-                        Remember me
+                        Ingat saya
                     </label>
                 </div>
 
                 <button type="submit"
                         class="w-full bg-red-600 hover:bg-red-750 dark:hover:bg-red-500 active:scale-[0.98] text-sm font-semibold text-white py-3 rounded-xl transition-all shadow-lg shadow-red-600/10 cursor-pointer mt-2">
-                    Sign In
+                    Masuk
                 </button>
             </form>
         </div>

@@ -100,7 +100,14 @@ class FakeConnection extends \Illuminate\Database\SQLiteConnection
         // 4. General select queries
         if ($table) {
             $filtered = $this->filterRows($table, $query, $bindings);
-            return array_map(fn($row) => (object)$row, $filtered);
+            return array_map(function($row) {
+                foreach ($row as $key => $value) {
+                    if (is_array($value)) {
+                        $row[$key] = json_encode($value);
+                    }
+                }
+                return (object)$row;
+            }, $filtered);
         }
 
         return [];
@@ -125,8 +132,10 @@ class FakeConnection extends \Illuminate\Database\SQLiteConnection
                     $row[$col] = $bindings[$index] ?? null;
                 }
                 
-                self::$lastInsertId++;
-                $row['id'] = self::$lastInsertId;
+                if (!isset($row['id']) || empty($row['id'])) {
+                    self::$lastInsertId++;
+                    $row['id'] = self::$lastInsertId;
+                }
                 
                 if (isset($row['cable_details']) && is_string($row['cable_details'])) {
                     $row['cable_details'] = json_decode($row['cable_details'], true);
@@ -162,7 +171,11 @@ class FakeConnection extends \Illuminate\Database\SQLiteConnection
                     foreach (self::$mockDatabase[$table] as &$row) {
                         if ($row['id'] == $id) {
                             foreach ($setCols as $index => $col) {
-                                $row[$col] = $bindings[$index] ?? null;
+                                $val = $bindings[$index] ?? null;
+                                if ($col === 'cable_details' && is_string($val)) {
+                                    $val = json_decode($val, true);
+                                }
+                                $row[$col] = $val;
                             }
                             break;
                         }
@@ -266,7 +279,6 @@ abstract class TestCase extends BaseTestCase
         });
 
         \Illuminate\Database\Eloquent\Model::setConnectionResolver($this->app->make('db'));
-
         try {
             parent::setUp();
         } catch (\Throwable $e) {

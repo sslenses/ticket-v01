@@ -26,7 +26,7 @@ class AuthTest extends TestCase
     {
         $response = $this->get('/login');
         $response->assertStatus(200);
-        $response->assertSee('Welcome Back');
+        $response->assertSee('Technical Ticket Network');
     }
 
     /**
@@ -81,9 +81,9 @@ class AuthTest extends TestCase
     }
 
     /**
-     * Test that guests can access a ticket's detail page in a simplified form.
+     * Test that guests can access a ticket's detail page with all technical details.
      */
-    public function test_guest_can_access_active_ticket_details_simplified(): void
+    public function test_guest_can_access_active_ticket_details(): void
     {
         $ticket = \App\Models\Ticket::create([
             'label' => 'TICKET-ACTIVE-101',
@@ -95,16 +95,17 @@ class AuthTest extends TestCase
             'status' => \App\Models\Ticket::STATUS_WAITING_DESTINATION,
         ]);
 
-        $response = $this->get("/tickets/{$ticket->id}");
+        $response = $this->get("/tickets/{$ticket->uuid}");
 
         $response->assertStatus(200);
-        $response->assertSee('Technical Data Locked');
-        $response->assertSee('Audit logs Locked');
-        $response->assertDontSee($ticket->source_device);
+        $response->assertDontSee('Technical Data Locked');
+        $response->assertDontSee('Audit logs Locked');
+        $response->assertSee($ticket->source_device);
+        $response->assertSee($ticket->destination_device);
     }
 
     /**
-     * Test that guests cannot access a ticket's detail page if it is completed (done).
+     * Test that guests cannot access a ticket's detail page if it is completed (done) more than 1 week ago.
      */
     public function test_guest_cannot_access_done_ticket(): void
     {
@@ -117,8 +118,52 @@ class AuthTest extends TestCase
             'connector_type' => 'LC',
             'status' => \App\Models\Ticket::STATUS_DONE,
         ]);
+        $ticket->updated_at = now()->subDays(8);
+        $ticket->save();
 
-        $response = $this->get("/tickets/{$ticket->id}");
+        $response = $this->get("/tickets/{$ticket->uuid}");
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test that guests can access recently completed tickets (completed < 1 week ago) with all details.
+     */
+    public function test_guest_can_access_recently_completed_ticket(): void
+    {
+        $ticket = \App\Models\Ticket::create([
+            'label' => 'TICKET-DONE-NEW',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'connector_type' => 'LC',
+            'status' => \App\Models\Ticket::STATUS_DONE,
+        ]);
+
+        $response = $this->get("/tickets/{$ticket->uuid}");
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Technical Data Locked');
+        $response->assertSee($ticket->source_device);
+    }
+
+    /**
+     * Test that guests cannot access cancelled tickets.
+     */
+    public function test_guest_cannot_access_cancelled_ticket(): void
+    {
+        $ticket = \App\Models\Ticket::create([
+            'label' => 'TICKET-CANCELLED-101',
+            'source_device' => 'Device A',
+            'destination_device' => 'Device B',
+            'source_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'destination_tenant_id' => \Illuminate\Support\Str::uuid(),
+            'connector_type' => 'LC',
+            'status' => \App\Models\Ticket::STATUS_CANCELLED,
+        ]);
+
+        $response = $this->get("/tickets/{$ticket->uuid}");
 
         $response->assertStatus(403);
     }
@@ -139,7 +184,7 @@ class AuthTest extends TestCase
             'status' => \App\Models\Ticket::STATUS_DONE,
         ]);
 
-        $response = $this->actingAs($user)->get("/tickets/{$ticket->id}");
+        $response = $this->actingAs($user)->get("/tickets/{$ticket->uuid}");
 
         $response->assertStatus(200);
         $response->assertSee($ticket->source_device);

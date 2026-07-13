@@ -1,0 +1,20 @@
+import pexpect
+import sys
+
+HOST = "110.76.147.65"
+USER = "root"
+PASSWORD = "password~"
+
+print(f"Connecting to {USER}@{HOST}...")
+child = pexpect.spawn(f"ssh -o StrictHostKeyChecking=no {USER}@{HOST}", encoding='utf-8')
+child.logfile = sys.stdout
+
+child.expect("password:")
+child.sendline(PASSWORD)
+child.expect("#")
+
+print("Fetching db logs...")
+child.sendline("cd ~/ticket-v01 && docker compose logs db --tail=50")
+child.expect("#")
+
+child.sendline("exit")

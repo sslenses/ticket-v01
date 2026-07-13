@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'user_id',
     'from_state',
     'to_state',
+    'fab_file',
+    'ba_file',
+    'keterangan',
 ])]
 class TicketLog extends Model
 {

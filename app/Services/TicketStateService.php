@@ -16,13 +16,15 @@ class TicketStateService
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function transition(Ticket $ticket, string $toState): void
+    public function transition(Ticket $ticket, string $toState, array $extraData = []): void
     {
         $fromState = $ticket->status;
+        $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-');
+        $isSRV = str_starts_with(strtoupper($ticket->label), 'SRV-');
 
         $validTransitions = [
             Ticket::STATUS_WAITING_DESTINATION => [Ticket::STATUS_APPROVED_DESTINATION, Ticket::STATUS_CANCELLED],
-            Ticket::STATUS_APPROVED_DESTINATION => [Ticket::STATUS_APPROVED_ADMIN, Ticket::STATUS_CANCELLED],
+            Ticket::STATUS_APPROVED_DESTINATION => [($isPO || $isSRV) ? Ticket::STATUS_SENDED_CABLE : Ticket::STATUS_APPROVED_ADMIN, Ticket::STATUS_CANCELLED],
             Ticket::STATUS_APPROVED_ADMIN => [Ticket::STATUS_SENDED_CABLE, Ticket::STATUS_CANCELLED],
             Ticket::STATUS_SENDED_CABLE => [Ticket::STATUS_RECEIVED_CABLE, Ticket::STATUS_CANCELLED],
             Ticket::STATUS_RECEIVED_CABLE => [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED],
@@ -41,6 +43,9 @@ class TicketStateService
             'user_id' => Auth::id(),
             'from_state' => $fromState,
             'to_state' => $toState,
+            'fab_file' => $extraData['fab_file'] ?? null,
+            'ba_file' => $extraData['ba_file'] ?? null,
+            'keterangan' => $extraData['keterangan'] ?? null,
         ]);
     }
 }

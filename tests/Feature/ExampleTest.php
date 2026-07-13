@@ -39,7 +39,7 @@ class ExampleTest extends TestCase
         $response = $this->actingAs($user)->get('/');
         $response->assertStatus(200);
         $response->assertSee('x-model="searchQuery"', false);
-        $response->assertSee('placeholder="Search by label, device, or status..."', false);
+        $response->assertSee('placeholder="Cari berdasarkan label, perangkat, atau status..."', false);
         $response->assertSee('TICKET-SEARCH-101');
         $response->assertSee('filteredTickets()');
         $response->assertSee('activeStatusFilter: \'all\'', false);

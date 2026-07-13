@@ -13,7 +13,7 @@ class TicketPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('staff') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+        return $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 
     /**
@@ -35,7 +35,7 @@ class TicketPolicy
         if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
             return false;
         }
-        return $user->hasRole('admin');
+        return $user->hasRole('admin') || $user->hasRole('teknisi');
     }
 
     /**
@@ -46,7 +46,7 @@ class TicketPolicy
         if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
             return false;
         }
-        return $user->hasRole('admin');
+        return $user->hasRole('admin') || $user->hasRole('teknisi');
     }
 
     /**
@@ -57,7 +57,7 @@ class TicketPolicy
         if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
             return false;
         }
-        return $user->hasRole('admin');
+        return $user->hasRole('admin') || $user->hasRole('teknisi');
     }
 
     /**
@@ -80,7 +80,7 @@ class TicketPolicy
             return false;
         }
 
-        return $user->hasRole('staff') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+        return $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 
     /**
@@ -92,6 +92,14 @@ class TicketPolicy
             return false;
         }
 
-        return $user->hasRole('staff') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+        return $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+    }
+
+    /**
+     * Determine whether the user can delete the ticket.
+     */
+    public function delete(User $user, Ticket $ticket): bool
+    {
+        return $user->hasRole('admin');
     }
 }

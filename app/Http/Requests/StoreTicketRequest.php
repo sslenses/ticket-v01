@@ -24,12 +24,50 @@ class StoreTicketRequest extends FormRequest
     {
         return [
             'label' => 'required|string|unique:tickets,label',
-            'source_device' => 'required|string',
-            'destination_device' => 'required|string',
-            'source_tenant_id' => 'required|uuid',
-            'destination_tenant_id' => 'required|uuid',
-            'connector_type' => 'required|string',
-            'cable_details' => 'nullable|array',
+            'source_device' => 'nullable|string',
+            'destination_device' => 'nullable|string',
+            'source_tenant_id' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if ($value !== null && $value !== 'NEW_TENANT' && !\Illuminate\Support\Str::isUuid($value)) {
+                        $fail('The selected ' . str_replace('_', ' ', $attribute) . ' is invalid.');
+                    }
+                }
+            ],
+            'new_source_tenant_name' => 'required_if:source_tenant_id,NEW_TENANT|nullable|string|max:255',
+            'destination_tenant_id' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if ($value !== null && $value !== 'NEW_TENANT' && !\Illuminate\Support\Str::isUuid($value)) {
+                        $fail('The selected ' . str_replace('_', ' ', $attribute) . ' is invalid.');
+                    }
+                }
+            ],
+            'new_destination_tenant_name' => 'required_if:destination_tenant_id,NEW_TENANT|nullable|string|max:255',
+            'connector_type' => 'nullable|string',
+            'cable_details' => 'required|array',
+            'cable_details.user_name' => 'required|string',
+            'cable_details.user_contact' => 'nullable|string',
+            'cable_details.backhaul' => 'nullable|string',
+            'cable_details.metro' => 'nullable|string',
+            'cable_details.destination_site' => 'nullable|string',
+            'cable_details.capacity' => 'nullable|string',
+            'cable_details.length' => 'nullable|integer',
+            'cable_details.color' => 'nullable|string',
+            'cable_details.type' => 'nullable|string',
+            'cable_details.notes' => 'nullable|string',
+            'cable_details.alamat' => 'nullable|string',
+            'cable_details.titik_koordinat' => 'nullable|string',
+            'cable_details.link_maps' => 'nullable|string',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'cable_details.user_name' => 'User Name',
         ];
     }
 }
