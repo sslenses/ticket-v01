@@ -87,7 +87,7 @@
                             </form>
                         </div>
                         <button @click="$dispatch('open-changelog')" class="w-full px-3 py-2 text-[10px] text-zinc-400 dark:text-zinc-500 text-center font-medium hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer rounded-b-lg">
-                            Version 1.0.9
+                            Version 1.1.1
                         </button>
                     </div>
                 </div>
@@ -160,7 +160,7 @@
             </div>
             @endauth
             <button @click="$dispatch('open-changelog')" class="mt-4 w-full text-center text-[10px] text-zinc-400 dark:text-zinc-500 font-medium hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors py-1">
-                Version 1.0.9
+                Version 1.1.1
             </button>
         </div>
     </header>

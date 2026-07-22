@@ -18,9 +18,21 @@
             </div>
             
             <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                <!-- Version 1.1.0 -->
+                <!-- Version 1.1.1 -->
                 <div class="relative pl-4 border-l-2 border-emerald-500/30">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-zinc-900"></div>
+                    <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.1 <span class="text-xs font-normal text-zinc-500 ml-2">22 Juli 2026</span></h4>
+                    <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
+                        <li>Dinamisasi tanggal dan waktu pada linimasa <b>Progress Tiket (Stage 1)</b> berdasarkan timestamp pembuatan tiket nyata.</li>
+                        <li>Pencatatan riwayat transisi log otomatis saat pembuatan tiket baru.</li>
+                        <li>Peningkatan keamanan Blade layout header dan penanganan otorisasi peran (<i>role & permission</i>).</li>
+                        <li>Stabilisasi seluruh pengujian otomatis (<i>Automated Test Suite</i> 100% Pass).</li>
+                    </ul>
+                </div>
+
+                <!-- Version 1.1.0 -->
+                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.0 <span class="text-xs font-normal text-zinc-500 ml-2">13 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
                         <li>Menambahkan tab khusus <b>Detail Teknis</b> pada formulir <i>Ubah Detail Tiket</i>.</li>
