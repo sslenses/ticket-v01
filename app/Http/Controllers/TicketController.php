@@ -107,6 +107,16 @@ class TicketController extends Controller
         $ticket->destination_tenant_id = $destTenantId ?? $ticket->uuid;
         $ticket->save();
 
+        if (auth()->check()) {
+            TicketLog::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => auth()->id(),
+                'from_state' => 'draft',
+                'to_state' => Ticket::STATUS_WAITING_DESTINATION,
+                'keterangan' => 'Tiket baru dibuat',
+            ]);
+        }
+
         return response()->json($ticket, 201);
     }
 

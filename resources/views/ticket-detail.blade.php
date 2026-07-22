@@ -276,13 +276,21 @@
                     return this.currentStatus === status && status !== 'done';
                 },
 
+                ticketCreatedAtDate: '{{ $ticket->created_at ? $ticket->created_at->format("d M Y") : "" }}',
+                ticketCreatedAtTime: '{{ $ticket->created_at ? $ticket->created_at->format("H:i") : "" }}',
+                ticketCreatorName: '{{ $ticket->logs->first()?->user?->name ?? "Staf Pembuat" }}',
+
                 getExecutor(status) {
                     const log = this.ticketLogs.find(l => l.to === status);
                     if (log) {
                         return { name: log.user, time: log.time, date: log.date };
                     }
                     if (status === 'waiting_destination') {
-                        return { name: 'Staf Pembuat', time: '08:00', date: '17 Jun 2026' };
+                        return { 
+                            name: this.ticketCreatorName || 'Staf Pembuat', 
+                            time: this.ticketCreatedAtTime, 
+                            date: this.ticketCreatedAtDate 
+                        };
                     }
                     return null;
                 },
