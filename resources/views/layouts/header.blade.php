@@ -20,7 +20,7 @@
                     <a href="/tickets" class="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors {{ $activeMenu == 'tickets' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}">
                         Tiket
                     </a>
-                    @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('dest_manager'))
+                    @if (auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('dest_manager')))
                         <a href="/users" class="text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors {{ $activeMenu == 'users' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}">
                             Pengguna
                         </a>
@@ -42,6 +42,7 @@
                     </svg>
                 </button>
 
+                @auth
                 <!-- User Profile Dropdown -->
                 <div class="relative">
                     <button @click="dropdownOpen = !dropdownOpen" class="w-9 h-9 rounded-full bg-gradient-to-tr from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white flex items-center justify-center font-bold text-sm tracking-wider transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500/50 dark:focus:ring-offset-zinc-950 cursor-pointer shadow-md active:scale-95">
@@ -90,6 +91,7 @@
                         </button>
                     </div>
                 </div>
+                @endauth
             </div>
 
             <!-- Mobile Controls: Theme + Burger Toggle (hidden on desktop) -->
@@ -134,7 +136,7 @@
                 <a href="/tickets" class="text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors {{ $activeMenu == 'tickets' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}">
                     Tiket
                 </a>
-                @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('dest_manager'))
+                @if (auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('dest_manager')))
                     <a href="/users" class="text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors {{ $activeMenu == 'users' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}">
                         Pengguna
                     </a>
@@ -142,6 +144,7 @@
                 @endif
             </nav>
 
+            @auth
             <!-- Profile Info & Logout -->
             <div class="border-t border-zinc-200 dark:border-zinc-800 pt-4 flex items-center justify-between">
                 <div class="flex flex-col">
@@ -155,6 +158,7 @@
                     </button>
                 </form>
             </div>
+            @endauth
             <button @click="$dispatch('open-changelog')" class="mt-4 w-full text-center text-[10px] text-zinc-400 dark:text-zinc-500 font-medium hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors py-1">
                 Version 1.0.9
             </button>
