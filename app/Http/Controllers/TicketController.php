@@ -73,6 +73,28 @@ class TicketController extends Controller
 
         $validated = $request->validated();
         
+        $sourceTenantId = $request->input('source_tenant_id');
+        if ($sourceTenantId === 'NEW_TENANT' && $request->filled('new_source_tenant_name')) {
+            $name = $request->input('new_source_tenant_name');
+            $code = 'T-' . Str::upper(Str::slug($name, '-'));
+            $tenant = Tenant::firstOrCreate(
+                ['code' => $code],
+                ['name' => $name]
+            );
+            $sourceTenantId = $tenant->id;
+        }
+
+        $destTenantId = $request->input('destination_tenant_id');
+        if ($destTenantId === 'NEW_TENANT' && $request->filled('new_destination_tenant_name')) {
+            $name = $request->input('new_destination_tenant_name');
+            $code = 'T-' . Str::upper(Str::slug($name, '-'));
+            $tenant = Tenant::firstOrCreate(
+                ['code' => $code],
+                ['name' => $name]
+            );
+            $destTenantId = $tenant->id;
+        }
+
         unset($validated['source_tenant_id']);
         unset($validated['destination_tenant_id']);
         unset($validated['new_source_tenant_name']);
@@ -80,9 +102,9 @@ class TicketController extends Controller
 
         $ticket = new Ticket($validated);
         $ticket->status = Ticket::STATUS_WAITING_DESTINATION;
-        $ticket->uuid = (string) \Illuminate\Support\Str::uuid();
-        $ticket->source_tenant_id = $ticket->uuid;
-        $ticket->destination_tenant_id = $ticket->uuid;
+        $ticket->uuid = (string) Str::uuid();
+        $ticket->source_tenant_id = $sourceTenantId ?? $ticket->uuid;
+        $ticket->destination_tenant_id = $destTenantId ?? $ticket->uuid;
         $ticket->save();
 
         return response()->json($ticket, 201);
@@ -228,8 +250,7 @@ class TicketController extends Controller
             }
 
             if ($status === Ticket::STATUS_RECEIVED_CABLE && $isPO) {
-                $rules['btest_proof'] = 'required|array';
-                $rules['btest_proof.*'] = 'file|image|mimes:png,jpg,jpeg|max:51200';
+                $rules['btest_proof'] = 'required';
                 $rules['qos_proof'] = 'required|file|image|mimes:png,jpg,jpeg|max:51200';
                 $rules['ip_ptp'] = 'required|string|max:255';
                 $rules['ip_public'] = 'required|string|max:255';
@@ -283,16 +304,20 @@ class TicketController extends Controller
                 $cableDetails = $ticket->cable_details ?? [];
                 
                 if ($request->hasFile('btest_proof')) {
+                    $btestFiles = $request->file('btest_proof');
+                    if (!is_array($btestFiles)) {
+                        $btestFiles = [$btestFiles];
+                    }
                     $btestPaths = [];
-                    foreach ($request->file('btest_proof') as $file) {
+                    foreach ($btestFiles as $file) {
                         $btestPaths[] = '/storage/' . $file->store('uploads/tickets/' . $ticket->uuid, 'public');
                     }
                     $cableDetails['btest_proof'] = $btestPaths;
                 }
                 if ($request->input('remove_existing_qos') === '1') {
-            unset($cableDetails['qos_proof']);
-        }
-        if ($request->hasFile('qos_proof')) {
+                    unset($cableDetails['qos_proof']);
+                }
+                if ($request->hasFile('qos_proof')) {
                     $qosPath = $request->file('qos_proof')->store('uploads/tickets/' . $ticket->uuid, 'public');
                     $cableDetails['qos_proof'] = '/storage/' . $qosPath;
                 }
@@ -375,16 +400,37 @@ class TicketController extends Controller
             'cable_details.notes' => 'nullable|string',
             'cable_details.alamat' => 'nullable|string',
             'cable_details.titik_koordinat' => 'nullable|string',
-                        'cable_details.link_maps' => 'nullable|string',
+            'cable_details.link_maps' => 'nullable|string',
             'cable_details.ip_ptp' => 'nullable|string',
             'cable_details.ip_public' => 'nullable|string',
             'cable_details.vlan' => 'nullable|string',
             'cable_details.device_name' => 'nullable|string',
             'cable_details.device_port' => 'nullable|string',
-            'btest_proof' => 'nullable|array',
-            'btest_proof.*' => 'file|image|mimes:png,jpg,jpeg|max:51200',
+            'btest_proof' => 'nullable',
             'qos_proof' => 'nullable|file|image|mimes:png,jpg,jpeg|max:51200',
         ]);
+
+        $sourceTenantId = $request->input('source_tenant_id', $ticket->source_tenant_id);
+        if ($sourceTenantId === 'NEW_TENANT' && $request->filled('new_source_tenant_name')) {
+            $name = $request->input('new_source_tenant_name');
+            $code = 'T-' . Str::upper(Str::slug($name, '-'));
+            $tenant = Tenant::firstOrCreate(
+                ['code' => $code],
+                ['name' => $name]
+            );
+            $sourceTenantId = $tenant->id;
+        }
+
+        $destTenantId = $request->input('destination_tenant_id', $ticket->destination_tenant_id);
+        if ($destTenantId === 'NEW_TENANT' && $request->filled('new_destination_tenant_name')) {
+            $name = $request->input('new_destination_tenant_name');
+            $code = 'T-' . Str::upper(Str::slug($name, '-'));
+            $tenant = Tenant::firstOrCreate(
+                ['code' => $code],
+                ['name' => $name]
+            );
+            $destTenantId = $tenant->id;
+        }
 
         unset($validated['new_source_tenant_name']);
         unset($validated['new_destination_tenant_name']);
@@ -397,7 +443,11 @@ class TicketController extends Controller
         $keptBtests = $request->input('existing_btests', []);
         $newBtests = [];
         if ($request->hasFile('btest_proof')) {
-            foreach ($request->file('btest_proof') as $file) {
+            $btestFiles = $request->file('btest_proof');
+            if (!is_array($btestFiles)) {
+                $btestFiles = [$btestFiles];
+            }
+            foreach ($btestFiles as $file) {
                 $newBtests[] = '/storage/' . $file->store('uploads/tickets/' . $ticket->uuid, 'public');
             }
         }
@@ -420,6 +470,8 @@ class TicketController extends Controller
         }
 
         $validated['cable_details'] = array_merge($cableDetails, $validated['cable_details'] ?? []);
+        $validated['source_tenant_id'] = $sourceTenantId;
+        $validated['destination_tenant_id'] = $destTenantId;
         unset($validated['btest_proof']);
         unset($validated['qos_proof']);
 

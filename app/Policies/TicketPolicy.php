@@ -13,7 +13,7 @@ class TicketPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+        return $user->hasRole('staff') || $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 
     /**
@@ -35,7 +35,7 @@ class TicketPolicy
         if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
             return false;
         }
-        return $user->hasRole('admin') || $user->hasRole('teknisi');
+        return $user->hasRole('admin') || $user->hasRole('teknisi') || $user->hasRole('staff');
     }
 
     /**
@@ -46,7 +46,7 @@ class TicketPolicy
         if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
             return false;
         }
-        return $user->hasRole('admin') || $user->hasRole('teknisi');
+        return $user->hasRole('admin') || $user->hasRole('teknisi') || $user->hasRole('staff');
     }
 
     /**
@@ -57,7 +57,7 @@ class TicketPolicy
         if (in_array($ticket->status, [Ticket::STATUS_DONE, Ticket::STATUS_CANCELLED])) {
             return false;
         }
-        return $user->hasRole('admin') || $user->hasRole('teknisi');
+        return $user->hasRole('admin') || $user->hasRole('teknisi') || $user->hasRole('staff');
     }
 
     /**
@@ -80,7 +80,7 @@ class TicketPolicy
             return false;
         }
 
-        return $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+        return $user->hasRole('staff') || $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 
     /**
@@ -92,7 +92,7 @@ class TicketPolicy
             return false;
         }
 
-        return $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
+        return $user->hasRole('staff') || $user->hasRole('teknisi') || $user->hasRole('dest_manager') || $user->hasRole('admin');
     }
 
     /**

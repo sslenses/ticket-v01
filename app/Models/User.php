@@ -38,6 +38,12 @@ class User extends Authenticatable
      */
     public function hasRole(string $role): bool
     {
+        if ($role === 'staff' && $this->role === 'teknisi') {
+            return true;
+        }
+        if ($role === 'teknisi' && $this->role === 'staff') {
+            return true;
+        }
         return $this->role === $role;
     }
 }
