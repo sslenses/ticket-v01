@@ -3,13 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "80:80"
       - "8443:443"
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=production
+      - APP_DEBUG=false
       - SERVER_NAME=:80
+      - OCTANE_SERVER=frankenphp
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
@@ -39,13 +41,16 @@ services:
       - DB_PASSWORD=postgres
     volumes:
       - .:/app
-    command: php artisan migrate --force
+    command: sh -c "composer install --no-interaction && php artisan migrate --force"
     depends_on:
       db:
         condition: service_healthy
 
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
     environment:
       - POSTGRES_DB=ticket_db
       - POSTGRES_USER=postgres
