@@ -19,7 +19,7 @@ class TicketStateService
     public function transition(Ticket $ticket, string $toState, array $extraData = []): void
     {
         $fromState = $ticket->status;
-        $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-');
+        $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-') || str_starts_with(strtoupper($ticket->label), 'DIS-');
         $isSRV = str_starts_with(strtoupper($ticket->label), 'SRV-');
 
         $validTransitions = [
