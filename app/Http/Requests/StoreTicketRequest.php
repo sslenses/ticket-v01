@@ -58,6 +58,7 @@ class StoreTicketRequest extends FormRequest
             'cable_details.color' => 'nullable|string',
             'cable_details.type' => 'nullable|string',
             'cable_details.notes' => 'nullable|string',
+            'cable_details.keterangan' => 'nullable|string',
             'cable_details.alamat' => 'nullable|string',
             'cable_details.titik_koordinat' => 'nullable|string',
             'cable_details.link_maps' => 'nullable|string',
