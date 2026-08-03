@@ -227,6 +227,7 @@
                     color: 'Yellow',
                     type: 'Single-Mode OS2',
                     notes: '',
+                    keterangan: '',
                     user_name: '',
                     user_contact: '',
                     backhaul: '',
@@ -277,7 +278,8 @@
                                     length: parseInt(this.newTicket.length),
                                     color: this.newTicket.color,
                                     type: this.newTicket.type,
-                                    notes: this.newTicket.notes,
+                                    notes: this.newTicket.keterangan || this.newTicket.notes,
+                                    keterangan: this.newTicket.keterangan,
                                     user_name: this.newTicket.user_name,
                                     user_contact: this.newTicket.user_contact,
                                     backhaul: this.newTicket.backhaul,
@@ -646,6 +648,10 @@
                                         class="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 hover:bg-zinc-200/50 dark:bg-zinc-900/50 dark:hover:bg-zinc-800/50 active:scale-95 transition-all text-[10px] font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">
                                     PO Uplink
                                 </button>
+                                <button type="button" @click="newTicket.label = generateNextLabel('DIS-')"
+                                        class="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 hover:bg-zinc-200/50 dark:bg-zinc-900/50 dark:hover:bg-zinc-800/50 active:scale-95 transition-all text-[10px] font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">
+                                    DIS (PO Dismantle)
+                                </button>
                                 <button type="button" @click="newTicket.label = generateNextLabel('SRV-')"
                                         class="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 hover:bg-zinc-200/50 dark:bg-zinc-900/50 dark:hover:bg-zinc-800/50 active:scale-95 transition-all text-[10px] font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">
                                     SRV (Survey)
@@ -714,6 +720,12 @@
                                 <input type="text" x-model="newTicket.capacity" placeholder="10 Gbps"
                                        class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-red-600 transition-colors">
                             </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block mb-1">Keterangan</label>
+                            <textarea x-model="newTicket.keterangan" placeholder="Masukkan keterangan tambahan tiket..." rows="2"
+                                      class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-red-600 transition-colors resize-none"></textarea>
                         </div>
                     </div>
 
