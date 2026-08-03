@@ -69,7 +69,7 @@
                 ticketLogs: {!! json_encode($logsData) !!},
                 stages: (() => {
                     const labelPrefix = '{{ $ticket->label }}'.toUpperCase();
-                    const isPO = labelPrefix.startsWith('PO-') || labelPrefix.startsWith('UP-');
+                    const isPO = labelPrefix.startsWith('PO-') || labelPrefix.startsWith('UP-') || labelPrefix.startsWith('DIS-');
                     const isSRV = labelPrefix.startsWith('SRV-');
                     const allStages = [
                         { key: 'waiting_destination', label: 'Menunggu Destinasi', color: 'indigo' },
@@ -81,7 +81,7 @@
                     ];
                     return (isPO || isSRV) ? allStages.filter(s => s.key !== 'approved_admin') : allStages;
                 })(),
-                isPO: '{{ $ticket->label }}'.toUpperCase().startsWith('PO-') || '{{ $ticket->label }}'.toUpperCase().startsWith('UP-'),
+                isPO: '{{ $ticket->label }}'.toUpperCase().startsWith('PO-') || '{{ $ticket->label }}'.toUpperCase().startsWith('UP-') || '{{ $ticket->label }}'.toUpperCase().startsWith('DIS-'),
                 isSRV: '{{ $ticket->label }}'.toUpperCase().startsWith('SRV-'),
                 showEditModal: false,
                 showNoteModal: false,
