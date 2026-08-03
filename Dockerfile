@@ -22,7 +22,9 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
-# Composer is no longer run during build as the local vendor folder is synced directly.
+# Install composer dependencies
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-interaction --optimize-autoloader
 
 # Create symlink for FrankenPHP binary to prevent Octane from downloading it
 RUN ln -sf /usr/local/bin/frankenphp /app/frankenphp
