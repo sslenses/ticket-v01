@@ -55,6 +55,7 @@ class TicketController extends Controller
                 'user_name' => $ticket->getCableDetail('user_name'),
                 'user_contact' => $ticket->getCableDetail('user_contact'),
                 'notes' => $ticket->getCableDetail('notes'),
+                'keterangan' => $ticket->getCableDetail('keterangan') ?: $ticket->getCableDetail('notes'),
             ];
         });
 
@@ -108,12 +109,15 @@ class TicketController extends Controller
         $ticket->save();
 
         if (auth()->check()) {
+            $logKeterangan = $ticket->getCableDetail('keterangan')
+                ?: ($ticket->getCableDetail('notes') ?: 'Tiket baru dibuat');
+
             TicketLog::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => auth()->id(),
                 'from_state' => 'draft',
                 'to_state' => Ticket::STATUS_WAITING_DESTINATION,
-                'keterangan' => 'Tiket baru dibuat',
+                'keterangan' => $logKeterangan,
             ]);
         }
 
@@ -199,7 +203,7 @@ class TicketController extends Controller
             return response()->json(['message' => 'Unauthorized. Hanya admin yang dapat mengembalikan tiket.'], 403);
         }
 
-        $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-');
+        $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-') || str_starts_with(strtoupper($ticket->label), 'DIS-');
         $isSRV = str_starts_with(strtoupper($ticket->label), 'SRV-');
 
         $currentStatus = $ticket->status;
@@ -243,7 +247,7 @@ class TicketController extends Controller
     {
         try {
             $status = $request->input('status');
-            $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-');
+            $isPO = str_starts_with(strtoupper($ticket->label), 'PO-') || str_starts_with(strtoupper($ticket->label), 'UP-') || str_starts_with(strtoupper($ticket->label), 'DIS-');
             $isSRV = str_starts_with(strtoupper($ticket->label), 'SRV-');
 
             $rules = [
@@ -408,6 +412,7 @@ class TicketController extends Controller
             'cable_details.color' => 'nullable|string',
             'cable_details.type' => 'nullable|string',
             'cable_details.notes' => 'nullable|string',
+            'cable_details.keterangan' => 'nullable|string',
             'cable_details.alamat' => 'nullable|string',
             'cable_details.titik_koordinat' => 'nullable|string',
             'cable_details.link_maps' => 'nullable|string',
