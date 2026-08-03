@@ -18,9 +18,29 @@
             </div>
             
             <div class="p-6 overflow-y-auto flex-1 space-y-6">
+                <!-- Version 1.1.4 -->
+                <div class="relative pl-6 border-l-2 border-emerald-500/30">
+                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-zinc-900"></div>
+                    <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.4 <span class="text-xs font-normal text-zinc-500 ml-2">03 Agustus 2026</span></h4>
+                    <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
+                        <li>Menambahkan templat cepat baru <b>DIS (PO Dismantle)</b> dengan kode awalan <code>DIS-</code> pada modal pembuatan tiket.</li>
+                        <li>Pengintegrasian alur kerja PO Dismantle ke dalam sistem status dan transisi tiket.</li>
+                    </ul>
+                </div>
+
+                <!-- Version 1.1.3 -->
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
+                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
+                    <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.3 <span class="text-xs font-normal text-zinc-500 ml-2">01 Agustus 2026</span></h4>
+                    <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
+                        <li>Penambahan field input <b>Keterangan</b> pada formulir pembuatan tiket baru untuk semua jenis & templat tiket (PO, UP, SRV, ERR).</li>
+                        <li>Integrasi pencatatan log riwayat (<i>Ticket Log</i>) otomatis menggunakan teks Keterangan awal saat tiket baru dibuat.</li>
+                    </ul>
+                </div>
+
                 <!-- Version 1.1.2 -->
-                <div class="relative pl-4 border-l-2 border-emerald-500/30">
-                    <div class="absolute -left-\[5px\] top-1\.5 w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-zinc-900"></div>
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
+                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.2 <span class="text-xs font-normal text-zinc-500 ml-2">22 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
                         <li>Fleksibilitas penanganan berkas pengujian BTest (single / multiple file upload).</li>
@@ -28,9 +48,10 @@
                         <li>Pencatatan log otomatis untuk tiket baru.</li>
                     </ul>
                 </div>
+
                 <!-- Version 1.1.1 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
-                    <div class="absolute -left-\[5px\] top-1\.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
+                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.1 <span class="text-xs font-normal text-zinc-500 ml-2">22 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
                         <li>Dinamisasi tanggal dan waktu pada linimasa <b>Progress Tiket (Stage 1)</b> berdasarkan timestamp pembuatan tiket nyata.</li>
@@ -41,7 +62,7 @@
                 </div>
 
                 <!-- Version 1.1.0 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.1.0 <span class="text-xs font-normal text-zinc-500 ml-2">13 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -50,8 +71,9 @@
                         <li>Menambahkan tombol dan fitur aksi <b>Kembalikan Step</b> (<i>Rollback</i>) khusus untuk akun ber-<i>role</i> Admin.</li>
                     </ul>
                 </div>
+
                 <!-- Version 1.0.9 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.9 <span class="text-xs font-normal text-zinc-500 ml-2">10 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -60,7 +82,7 @@
                 </div>
 
                 <!-- Version 1.0.8 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.8 <span class="text-xs font-normal text-zinc-500 ml-2">10 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -70,7 +92,7 @@
                 </div>
 
                 <!-- Version 1.0.7 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.7 <span class="text-xs font-normal text-zinc-500 ml-2">09 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -83,7 +105,7 @@
                 </div>
 
                 <!-- Version 1.0.6 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.6 <span class="text-xs font-normal text-zinc-500 ml-2">09 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -95,8 +117,8 @@
                 </div>
 
                 <!-- Version 1.0.5 -->
-                <div class="relative pl-4 border-l-2 border-emerald-500/30">
-                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-zinc-900"></div>
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
+                    <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.5 <span class="text-xs font-normal text-zinc-500 ml-2">09 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
                         <li>Menambahkan menu Daftar Tiket dengan progress bar keseluruhan secara interaktif.</li>
@@ -106,7 +128,7 @@
                 </div>
 
                 <!-- Version 1.0.4 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.4 <span class="text-xs font-normal text-zinc-500 ml-2">08 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -116,7 +138,7 @@
                 </div>
 
                 <!-- Version 1.0.3 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.3 <span class="text-xs font-normal text-zinc-500 ml-2">08 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -128,7 +150,7 @@
                 </div>
 
                 <!-- Version 1.0.2 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.2 <span class="text-xs font-normal text-zinc-500 ml-2">07 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -138,7 +160,7 @@
                 </div>
 
                 <!-- Version 1.0.1 -->
-                <div class="relative pl-4 border-l-2 border-zinc-200 dark:border-zinc-800">
+                <div class="relative pl-6 border-l-2 border-zinc-200 dark:border-zinc-800">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-zinc-200 dark:bg-zinc-700 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.1 <span class="text-xs font-normal text-zinc-500 ml-2">06 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
@@ -150,7 +172,7 @@
                 </div>
 
                 <!-- Version 1.0.0 -->
-                <div class="relative pl-4 border-l-2 border-red-500/30">
+                <div class="relative pl-6 border-l-2 border-red-500/30">
                     <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-red-500 ring-4 ring-white dark:ring-zinc-900"></div>
                     <h4 class="font-bold text-zinc-900 dark:text-zinc-100 text-sm">Version 1.0.0 <span class="text-xs font-normal text-zinc-500 ml-2">06 Juli 2026</span></h4>
                     <ul class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc list-inside space-y-1">
