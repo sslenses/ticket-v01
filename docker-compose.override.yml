@@ -1,0 +1,8 @@
+services:
+  app:
+    ports:
+      - "8088:80"
+      - "8444:443"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
