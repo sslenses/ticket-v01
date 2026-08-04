@@ -5,11 +5,11 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "8443:443"
+      - "${APP_PORT:-80}:80"
+      - "${APP_PORT_SSL:-443}:443"
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
       - SERVER_NAME=:80
       - OCTANE_SERVER=frankenphp
       - DB_CONNECTION=pgsql
@@ -18,30 +18,30 @@ services:
       - DB_DATABASE=ticket_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - APP_KEY=${APP_KEY}
     volumes:
       - .:/app
     depends_on:
       db:
         condition: service_healthy
-      migration:
-        condition: service_completed_successfully
 
   migration:
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
       - DB_DATABASE=ticket_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - APP_KEY=${APP_KEY}
     volumes:
       - .:/app
-    command: sh -c "composer install --no-interaction && php artisan migrate --force"
+    command: sh -c "php artisan migrate --force"
     depends_on:
       db:
         condition: service_healthy
@@ -50,7 +50,7 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "${DB_EXTERNAL_PORT:-5433}:5432"
     environment:
       - POSTGRES_DB=ticket_db
       - POSTGRES_USER=postgres
