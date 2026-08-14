@@ -16,8 +16,8 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - DB_DATABASE=ticket_db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - APP_KEY=${APP_KEY}
     volumes:
       - .:/app
@@ -35,9 +35,9 @@ services:
       - DB_CONNECTION=pgsql
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_DATABASE=ticket_db
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
+      - DB_DATABASE=${DB_DATABASE:-ticket_db}
+      - DB_USERNAME=${DB_USERNAME:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - APP_KEY=${APP_KEY}
     volumes:
       - .:/app
@@ -50,13 +50,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     ports:
-      - "${DB_EXTERNAL_PORT:-5433}:5432"
+      - "127.0.0.1:${DB_EXTERNAL_PORT:-5433}:5432"
     environment:
-      - POSTGRES_DB=ticket_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${DB_DATABASE:-ticket_db}
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ticket_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_DATABASE:-ticket_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
